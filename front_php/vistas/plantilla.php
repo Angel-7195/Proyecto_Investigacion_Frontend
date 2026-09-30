@@ -67,6 +67,13 @@ function renderizarPlantilla(
                     Términos clave
                 </a>
 
+                <a
+                    class="nav-link"
+                    href="/universidades"
+                >
+                    Universidades
+                </a>
+
             </div>
 
         </div>
