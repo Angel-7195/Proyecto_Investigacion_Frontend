@@ -57,6 +57,34 @@ function mostrarInicio(): void
 
         </div>
 
+        <div class="col-md-6 col-lg-4 mb-4">
+
+            <div class="card h-100 shadow-sm">
+
+                <div class="card-body">
+
+                    <h2 class="h5 card-title">
+                        Universidades
+                    </h2>
+
+                    <p class="card-text text-muted">
+                        Consulte, registre, edite y retire
+                        universidades del módulo.
+                    </p>
+
+                    <a
+                        href="/universidades"
+                        class="btn btn-primary"
+                    >
+                        Gestionar universidades
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
 </div>

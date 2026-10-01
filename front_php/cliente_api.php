@@ -210,3 +210,63 @@ function retirarTerminoClave(string $termino): array
         '/api/termino_clave/' . rawurlencode($termino)
     );
 }
+
+
+// ----------------------------------------------------------------------
+// UNIVERSIDAD
+// ----------------------------------------------------------------------
+
+function listarUniversidades(): array
+{
+    return enviarPeticionApi(
+        'GET',
+        '/api/universidad'
+    );
+}
+
+function obtenerUniversidad(int $id): array
+{
+    return enviarPeticionApi(
+        'GET',
+        '/api/universidad/' . rawurlencode((string) $id)
+    );
+}
+
+function crearUniversidad(array $datos): array
+{
+    return enviarPeticionApi(
+        'POST',
+        '/api/universidad',
+        $datos
+    );
+}
+
+function reemplazarUniversidad(
+    int $id,
+    array $datos
+): array {
+    return enviarPeticionApi(
+        'PUT',
+        '/api/universidad/' . rawurlencode((string) $id),
+        $datos
+    );
+}
+
+function actualizarUniversidad(
+    int $id,
+    array $datos
+): array {
+    return enviarPeticionApi(
+        'PATCH',
+        '/api/universidad/' . rawurlencode((string) $id),
+        $datos
+    );
+}
+
+function retirarUniversidad(int $id): array
+{
+    return enviarPeticionApi(
+        'DELETE',
+        '/api/universidad/' . rawurlencode((string) $id)
+    );
+}

@@ -187,3 +187,197 @@ function mostrarListaTerminosClave(): void
         $contenido
     );
 }
+
+
+/**
+ * Muestra el listado de universidades.
+ */
+function mostrarListaUniversidades(): void
+{
+    $respuesta = listarUniversidades();
+
+    ob_start();
+    ?>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h1 class="h2">
+                Universidades
+            </h1>
+
+            <p class="text-muted mb-0">
+                Consulte y administre las universidades registradas.
+            </p>
+        </div>
+
+        <a
+            href="/universidades/nuevo"
+            class="btn btn-primary"
+        >
+            Registrar universidad
+        </a>
+
+    </div>
+
+    <?php if (!$respuesta['disponible']): ?>
+
+        <div class="alert alert-warning">
+            El servicio no está disponible en este momento.
+            Puede continuar utilizando la aplicación e intentarlo nuevamente
+            más tarde.
+        </div>
+
+    <?php elseif ($respuesta['estado'] === 204): ?>
+
+        <div class="alert alert-info">
+            Todavía no hay universidades registradas.
+        </div>
+
+        <a
+            href="/universidades/nuevo"
+            class="btn btn-primary"
+        >
+            Registrar primera universidad
+        </a>
+
+    <?php elseif (!$respuesta['correcta']): ?>
+
+        <div class="alert alert-danger">
+            No fue posible consultar las universidades.
+        </div>
+
+    <?php else: ?>
+
+        <?php
+        $registros = $respuesta['datos']['datos'] ?? [];
+        ?>
+
+        <?php if ($registros === []): ?>
+
+            <div class="alert alert-info">
+                Todavía no hay universidades registradas.
+            </div>
+
+        <?php else: ?>
+
+            <div class="table-responsive">
+
+                <table class="table table-striped table-hover align-middle">
+
+                    <thead class="table-dark">
+
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Tipo</th>
+                            <th>Ciudad</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <?php foreach ($registros as $registro): ?>
+
+                            <?php
+                            $id = (int) ($registro['id'] ?? 0);
+                            $nombre = (string) ($registro['nombre'] ?? '');
+                            $tipo = (string) ($registro['tipo'] ?? '');
+                            $ciudad = (string) ($registro['ciudad'] ?? '');
+                            ?>
+
+                            <tr>
+
+                                <td>
+                                    <?= htmlspecialchars(
+                                        (string) $id,
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    ) ?>
+                                </td>
+
+                                <td>
+                                    <?= htmlspecialchars(
+                                        $nombre,
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    ) ?>
+                                </td>
+
+                                <td>
+                                    <?= htmlspecialchars(
+                                        $tipo,
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    ) ?>
+                                </td>
+
+                                <td>
+                                    <?= htmlspecialchars(
+                                        $ciudad,
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    ) ?>
+                                </td>
+
+                                <td class="text-end">
+
+                                    <a
+                                        href="/universidades/editar?id=<?= rawurlencode((string) $id) ?>"
+                                        class="btn btn-sm btn-outline-primary"
+                                    >
+                                        Editar
+                                    </a>
+
+                                    <form
+                                        method="POST"
+                                        action="/universidades/retirar"
+                                        class="d-inline"
+                                        onsubmit="return confirm('¿Desea retirar esta universidad?');"
+                                    >
+
+                                        <input
+                                            type="hidden"
+                                            name="id"
+                                            value="<?= htmlspecialchars(
+                                                (string) $id,
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            ) ?>"
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-sm btn-outline-danger"
+                                        >
+                                            Retirar
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                        <?php endforeach; ?>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        <?php endif; ?>
+
+    <?php endif; ?>
+
+    <?php
+    $contenido = (string) ob_get_clean();
+
+    renderizarPlantilla(
+        'Universidades',
+        $contenido
+    );
+}
