@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 /**
  * Envía una petición HTTP a la API de Investigación.
- *
  * Este archivo es el único punto del frontend que utiliza cURL
  * para comunicarse con la API.
  *
@@ -84,12 +83,10 @@ function enviarPeticionApi(
         }
 
         $opciones[CURLOPT_POSTFIELDS] = $json;
-
         $encabezados[] = 'Content-Type: application/json';
     }
 
     $opciones[CURLOPT_HTTPHEADER] = $encabezados;
-
     curl_setopt_array($curl, $opciones);
 
     $respuesta = curl_exec($curl);
@@ -151,7 +148,6 @@ function enviarPeticionApi(
     ];
 }
 
-
 // ----------------------------------------------------------------------
 // TERMINO CLAVE
 // ----------------------------------------------------------------------
@@ -211,7 +207,6 @@ function retirarTerminoClave(string $termino): array
     );
 }
 
-
 // ----------------------------------------------------------------------
 // UNIVERSIDAD
 // ----------------------------------------------------------------------
@@ -268,5 +263,65 @@ function retirarUniversidad(int $id): array
     return enviarPeticionApi(
         'DELETE',
         '/api/universidad/' . rawurlencode((string) $id)
+    );
+}
+
+// ----------------------------------------------------------------------
+// LINEA DE INVESTIGACION
+// ----------------------------------------------------------------------
+
+function listarLineasInvestigacion(): array
+{
+    return enviarPeticionApi(
+        'GET',
+        '/api/linea_investigacion'
+    );
+}
+
+function obtenerLineaInvestigacion(int $id): array
+{
+    return enviarPeticionApi(
+        'GET',
+        '/api/linea_investigacion/' . rawurlencode((string) $id)
+    );
+}
+
+function crearLineaInvestigacion(array $datos): array
+{
+    // No se incluye id: MariaDB lo genera automáticamente.
+    return enviarPeticionApi(
+        'POST',
+        '/api/linea_investigacion',
+        $datos
+    );
+}
+
+function reemplazarLineaInvestigacion(
+    int $id,
+    array $datos
+): array {
+    return enviarPeticionApi(
+        'PUT',
+        '/api/linea_investigacion/' . rawurlencode((string) $id),
+        $datos
+    );
+}
+
+function actualizarLineaInvestigacion(
+    int $id,
+    array $datos
+): array {
+    return enviarPeticionApi(
+        'PATCH',
+        '/api/linea_investigacion/' . rawurlencode((string) $id),
+        $datos
+    );
+}
+
+function retirarLineaInvestigacion(int $id): array
+{
+    return enviarPeticionApi(
+        'DELETE',
+        '/api/linea_investigacion/' . rawurlencode((string) $id)
     );
 }

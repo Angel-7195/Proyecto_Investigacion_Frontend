@@ -74,6 +74,13 @@ function renderizarPlantilla(
                     Universidades
                 </a>
 
+                <a
+                    class="nav-link"
+                    href="/lineas-investigacion"
+                >
+                    Líneas de investigación
+                </a>
+
             </div>
 
         </div>
