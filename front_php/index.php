@@ -1,9 +1,7 @@
 <?php
 /**
- * Enrutador integrado del frontend de Investigación v1.
- * Mantiene el panel de consulta de seis entidades y recupera los
- * formularios CRUD de termino_clave, universidad y linea_investigacion.
- * Las consultas a datos se realizan solo mediante cliente_api.php.
+ * Enrutador del frontend de Investigación v1.
+ * Conserva los CRUD originales e incorpora los otros tres recursos.
  */
 declare(strict_types=1);
 
@@ -13,24 +11,15 @@ $ruta = rtrim(
     '/'
 ) ?: '/';
 
-// El servidor PHP debe servir directamente los archivos de publico/.
-// Comprobamos la ruta real para no exponer archivos fuera de esta carpeta.
+// El servidor PHP entrega directamente los archivos de publico/.
 if (PHP_SAPI === 'cli-server') {
-    $rutaSolicitada = parse_url(
-        $_SERVER['REQUEST_URI'] ?? '/',
-        PHP_URL_PATH
-    ) ?: '/';
-
+    $rutaSolicitada = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
     $archivo = realpath(__DIR__ . rawurldecode($rutaSolicitada));
     $directorioPublico = realpath(__DIR__ . '/publico');
-
     if (
         $archivo !== false
         && $directorioPublico !== false
-        && str_starts_with(
-            $archivo,
-            $directorioPublico . DIRECTORY_SEPARATOR
-        )
+        && str_starts_with($archivo, $directorioPublico . DIRECTORY_SEPARATOR)
         && is_file($archivo)
     ) {
         return false;
@@ -44,145 +33,30 @@ require_once __DIR__ . '/vistas/inicio.php';
 require_once __DIR__ . '/vistas/lista.php';
 require_once __DIR__ . '/vistas/formulario.php';
 require_once __DIR__ . '/vistas/no_encontrada.php';
+require_once __DIR__ . '/rutas_restantes.php';
 
-$recursosPanel = [
-    'area_conocimiento' => 'Áreas de conocimiento',
-    'objetivo_desarrollo_sostenible' => 'Objetivos de Desarrollo Sostenible',
-    'area_aplicacion' => 'Áreas de aplicación',
-    'termino_clave' => 'Términos clave',
-    'universidad' => 'Universidades',
-    'linea_investigacion' => 'Líneas de investigación',
-];
-
-// Solo las tres entidades propias tienen pantallas CRUD integradas aquí.
-$rutasCrud = [
+// Mantiene los enlaces antiguos del panel: /?recurso=area_conocimiento, etc.
+$rutasPanel = [
+    'area_conocimiento' => '/areas-conocimiento',
+    'objetivo_desarrollo_sostenible' => '/objetivos-desarrollo-sostenible',
+    'area_aplicacion' => '/areas-aplicacion',
     'termino_clave' => '/terminos-clave',
     'universidad' => '/universidades',
     'linea_investigacion' => '/lineas-investigacion',
 ];
 
-function escapar(mixed $valor): string
-{
-    if (is_array($valor) || is_object($valor)) {
-        $valor = json_encode($valor, JSON_UNESCAPED_UNICODE);
-    }
-
-    return htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8');
-}
-
-// ----------------------------------------------------------------------
-// PANEL GENERAL: conserva la consulta de las seis entidades.
-// ----------------------------------------------------------------------
 if (($ruta === '/' || $ruta === '/index.php') && $metodo === 'GET') {
     $recurso = $_GET['recurso'] ?? '';
-    $recurso = is_string($recurso) ? $recurso : '';
-    $nombreRecurso = $recursosPanel[$recurso] ?? '';
-
-    // Para los recursos que tienen CRUD, ir al listado especializado.
-    if ($nombreRecurso !== '' && isset($rutasCrud[$recurso])) {
-        header('Location: ' . $rutasCrud[$recurso], true, 302);
+    if (is_string($recurso) && isset($rutasPanel[$recurso])) {
+        header('Location: ' . $rutasPanel[$recurso], true, 302);
         exit;
     }
+    mostrarInicio();
+    exit;
+}
 
-    $datos = [];
-    $error = '';
-
-    if ($nombreRecurso !== '') {
-        $respuesta = llamarApi('GET', $recurso);
-        $codigo = (int) ($respuesta['codigo'] ?? 0);
-
-        if ($codigo >= 200 && $codigo < 300) {
-            $contenido = $respuesta['datos'] ?? [];
-            $datos = is_array($contenido)
-                ? ($contenido['datos'] ?? [])
-                : [];
-
-            if (!is_array($datos)) {
-                $datos = [];
-            }
-        } else {
-            $error = ($respuesta['error'] ?? '')
-                ?: 'No fue posible consultar la API.';
-        }
-    }
-    ?>
-    <!doctype html>
-    <html lang="es">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Proyecto de Investigación</title>
-        <link rel="stylesheet" href="/publico/bootstrap.min.css">
-    </head>
-    <body class="bg-light">
-        <nav class="navbar navbar-dark bg-primary">
-            <div class="container">
-                <a class="navbar-brand" href="/">Proyecto de Investigación</a>
-            </div>
-        </nav>
-
-        <main class="container py-4">
-            <?php if ($nombreRecurso === ''): ?>
-                <h1 class="mb-2">Panel de investigación</h1>
-                <p class="text-secondary">
-                    Selecciona el recurso que deseas consultar o administrar.
-                </p>
-                <div class="row g-3">
-                    <?php foreach ($recursosPanel as $clave => $nombre): ?>
-                        <div class="col-12 col-md-6 col-lg-4">
-                            <div class="card h-100 shadow-sm">
-                                <div class="card-body">
-                                    <h2 class="h5"><?= escapar($nombre) ?></h2>
-                                    <a
-                                        class="btn btn-primary"
-                                        href="/?recurso=<?= rawurlencode($clave) ?>"
-                                    >
-                                        <?= isset($rutasCrud[$clave]) ? 'Gestionar' : 'Consultar' ?>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php else: ?>
-                <a href="/" class="btn btn-outline-secondary mb-3">← Volver</a>
-                <h1 class="h3 mb-3"><?= escapar($nombreRecurso) ?></h1>
-
-                <?php if ($error !== ''): ?>
-                    <div class="alert alert-warning"><?= escapar($error) ?></div>
-                <?php elseif (count($datos) === 0): ?>
-                    <div class="alert alert-info">No hay registros para mostrar.</div>
-                <?php else: ?>
-                    <p class="text-secondary">
-                        Total de registros: <?= count($datos) ?>
-                    </p>
-                    <div class="table-responsive bg-white rounded shadow-sm">
-                        <table class="table table-striped table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <?php foreach (array_keys((array) $datos[0]) as $columna): ?>
-                                        <th><?= escapar(ucfirst(str_replace('_', ' ', (string) $columna))) ?></th>
-                                    <?php endforeach; ?>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($datos as $fila): ?>
-                                    <tr>
-                                        <?php foreach ((array) $fila as $valor): ?>
-                                            <td><?= escapar($valor) ?></td>
-                                        <?php endforeach; ?>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                <?php endif; ?>
-            <?php endif; ?>
-        </main>
-        <script src="/publico/bootstrap.bundle.min.js"></script>
-    </body>
-    </html>
-    <?php
+// Enrutador de area_conocimiento, objetivo_desarrollo_sostenible y area_aplicacion.
+if (atenderRutasCrudRestantes($ruta, $metodo)) {
     exit;
 }
 
