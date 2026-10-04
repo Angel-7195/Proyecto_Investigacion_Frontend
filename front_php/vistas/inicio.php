@@ -4,122 +4,54 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/plantilla.php';
 
-/**
- * Muestra la página principal del módulo de Investigación.
- */
+/** Panel principal integrado de las seis entidades de Investigación v1. */
 function mostrarInicio(): void
 {
-    $contenido = <<<'HTML'
-<div class="py-4">
+    $recursos = [
+        ['titulo' => 'Áreas de conocimiento', 'ruta' => '/areas-conocimiento',
+         'descripcion' => 'Consulte y administre las grandes áreas, áreas y disciplinas.'],
+        ['titulo' => 'Objetivos de Desarrollo Sostenible', 'ruta' => '/objetivos-desarrollo-sostenible',
+         'descripcion' => 'Registre, edite y retire los objetivos y sus categorías.'],
+        ['titulo' => 'Áreas de aplicación', 'ruta' => '/areas-aplicacion',
+         'descripcion' => 'Gestione las áreas de aplicación del módulo.'],
+        ['titulo' => 'Términos clave', 'ruta' => '/terminos-clave',
+         'descripcion' => 'Administre términos clave y sus traducciones.'],
+        ['titulo' => 'Universidades', 'ruta' => '/universidades',
+         'descripcion' => 'Consulte y actualice la información de las universidades.'],
+        ['titulo' => 'Líneas de investigación', 'ruta' => '/lineas-investigacion',
+         'descripcion' => 'Gestione las líneas de investigación y sus descripciones.'],
+    ];
 
-    <div class="p-5 mb-4 bg-white border rounded-3 shadow-sm">
-        <div class="container-fluid py-3">
-
-            <h1 class="display-6 fw-bold">
-                Módulo de Investigación
-            </h1>
-
-            <p class="col-md-8 fs-5 text-muted">
-                Gestión de la información relacionada con el
-                módulo de investigación.
+    ob_start();
+    ?>
+    <div class="py-3">
+        <div class="p-4 mb-4 bg-white border rounded-3 shadow-sm">
+            <h1 class="display-6 fw-bold">Panel de investigación</h1>
+            <p class="mb-0 text-muted">
+                Seleccione cualquiera de los seis recursos para consultar o administrar sus registros.
             </p>
-
+        </div>
+        <div class="row g-3">
+            <?php foreach ($recursos as $recurso): ?>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body d-flex flex-column">
+                            <h2 class="h5 card-title">
+                                <?= htmlspecialchars($recurso['titulo'], ENT_QUOTES, 'UTF-8') ?>
+                            </h2>
+                            <p class="card-text text-muted flex-grow-1">
+                                <?= htmlspecialchars($recurso['descripcion'], ENT_QUOTES, 'UTF-8') ?>
+                            </p>
+                            <a class="btn btn-primary align-self-start"
+                               href="<?= htmlspecialchars($recurso['ruta'], ENT_QUOTES, 'UTF-8') ?>">
+                                Gestionar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
         </div>
     </div>
-
-    <div class="row">
-
-        <div class="col-md-6 col-lg-4 mb-4">
-
-            <div class="card h-100 shadow-sm">
-
-                <div class="card-body">
-
-                    <h2 class="h5 card-title">
-                        Términos clave
-                    </h2>
-
-                    <p class="card-text text-muted">
-                        Consulte, registre, edite y retire
-                        términos clave y sus traducciones.
-                    </p>
-
-                    <a
-                        href="/terminos-clave"
-                        class="btn btn-primary"
-                    >
-                        Gestionar términos clave
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-6 col-lg-4 mb-4">
-
-            <div class="card h-100 shadow-sm">
-
-                <div class="card-body">
-
-                    <h2 class="h5 card-title">
-                        Universidades
-                    </h2>
-
-                    <p class="card-text text-muted">
-                        Consulte, registre, edite y retire
-                        universidades del módulo.
-                    </p>
-
-                    <a
-                        href="/universidades"
-                        class="btn btn-primary"
-                    >
-                        Gestionar universidades
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-6 col-lg-4 mb-4">
-
-            <div class="card h-100 shadow-sm">
-
-                <div class="card-body">
-
-                    <h2 class="h5 card-title">
-                        Líneas de investigación
-                    </h2>
-
-                    <p class="card-text text-muted">
-                        Consulte, registre, edite y retire
-                        las líneas de investigación del módulo.
-                    </p>
-
-                    <a
-                        href="/lineas-investigacion"
-                        class="btn btn-primary"
-                    >
-                        Gestionar líneas de investigación
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-HTML;
-
-    renderizarPlantilla(
-        'Inicio',
-        $contenido
-    );
+    <?php
+    renderizarPlantilla('Inicio', (string) ob_get_clean());
 }
