@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/plantilla.php';
-require_once __DIR__ . '/../cliente_api.php';
+require_once __DIR__ . '/../../cliente_api.php';
 
 /**
  * Configuración exclusiva de las tres entidades cuya interfaz faltaba.
@@ -66,7 +66,7 @@ function erroresApiCrudRestante(array $respuesta): array
 }
 
 /** Mantiene visible el frontend aunque la API esté apagada. */
-function mostrarListaCrudRestante(string $recurso, array $errores = []): void
+function mostrarListaCatalogoCompartida(string $recurso, array $errores = []): void
 {
     $config = configuracionCrudRestantes()[$recurso];
     $respuesta = llamarApi('GET', $recurso);
@@ -152,7 +152,7 @@ function mostrarListaCrudRestante(string $recurso, array $errores = []): void
     renderizarPlantilla($config['titulo'], (string) ob_get_clean());
 }
 
-function mostrarFormularioCrudRestante(
+function mostrarFormularioCatalogoCompartido(
     string $recurso,
     string $modo,
     array $valores = [],
@@ -240,4 +240,46 @@ function mostrarErrorCrudRestante(string $titulo, array $errores): void
     <a class="btn btn-outline-secondary" href="/">Volver al inicio</a>
     <?php
     renderizarPlantilla($titulo, (string) ob_get_clean());
+}
+
+/**
+ * Puente de compatibilidad: las rutas existentes siguen llamando estas
+ * funciones hasta que reorganicemos el enrutador en otra etapa.
+ */
+function mostrarListaCrudRestante(string $recurso, array $errores = []): void
+{
+    switch ($recurso) {
+        case 'area_conocimiento':
+            mostrarListaAreaConocimiento($errores);
+            return;
+        case 'objetivo_desarrollo_sostenible':
+            mostrarListaObjetivosDesarrolloSostenible($errores);
+            return;
+        case 'area_aplicacion':
+            mostrarListaAreaAplicacion($errores);
+            return;
+        default:
+            throw new InvalidArgumentException('Recurso de catálogo no reconocido.');
+    }
+}
+
+function mostrarFormularioCrudRestante(
+    string $recurso,
+    string $modo,
+    array $valores = [],
+    array $errores = []
+): void {
+    switch ($recurso) {
+        case 'area_conocimiento':
+            mostrarFormularioAreaConocimiento($modo, $valores, $errores);
+            return;
+        case 'objetivo_desarrollo_sostenible':
+            mostrarFormularioObjetivosDesarrolloSostenible($modo, $valores, $errores);
+            return;
+        case 'area_aplicacion':
+            mostrarFormularioAreaAplicacion($modo, $valores, $errores);
+            return;
+        default:
+            throw new InvalidArgumentException('Recurso de catálogo no reconocido.');
+    }
 }

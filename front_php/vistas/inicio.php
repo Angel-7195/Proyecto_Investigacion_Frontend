@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/plantilla.php';
+require_once __DIR__ . '/compartidas/plantilla.php';
 
 /** Panel principal integrado de las seis entidades de Investigación v1. */
 function mostrarInicio(): void
@@ -25,7 +25,7 @@ function mostrarInicio(): void
     ob_start();
     ?>
     <div class="py-3">
-        <div class="p-4 mb-4 bg-white border rounded-3 shadow-sm">
+        <div class="p-4 mb-4 bg-white border rounded-3 shadow-sm panel-portada">
             <h1 class="display-6 fw-bold">Panel de investigación</h1>
             <p class="mb-0 text-muted">
                 Seleccione cualquiera de los seis recursos para consultar o administrar sus registros.
@@ -34,7 +34,7 @@ function mostrarInicio(): void
         <div class="row g-3">
             <?php foreach ($recursos as $recurso): ?>
                 <div class="col-12 col-md-6 col-lg-4">
-                    <div class="card h-100 shadow-sm">
+                    <div class="card h-100 shadow-sm tarjeta-recurso">
                         <div class="card-body d-flex flex-column">
                             <h2 class="h5 card-title">
                                 <?= htmlspecialchars($recurso['titulo'], ENT_QUOTES, 'UTF-8') ?>
