@@ -13,6 +13,7 @@ function renderizarPlantilla(string $titulo, string $contenido): void
         ['/terminos-clave', 'Términos clave'],
         ['/universidades', 'Universidades'],
         ['/lineas-investigacion', 'Líneas de investigación'],
+        ['/grupos-investigacion', 'Grupos de investigación'],
     ];
     ?>
     <!DOCTYPE html>

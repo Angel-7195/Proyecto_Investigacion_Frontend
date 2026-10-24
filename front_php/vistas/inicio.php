@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/compartidas/plantilla.php';
 
-/** Panel principal integrado de las seis entidades de Investigación v1. */
+/** Panel principal de V1 con la primera entidad de V2. */
 function mostrarInicio(): void
 {
     $recursos = [
@@ -20,6 +20,8 @@ function mostrarInicio(): void
          'descripcion' => 'Consulte y actualice la información de las universidades.'],
         ['titulo' => 'Líneas de investigación', 'ruta' => '/lineas-investigacion',
          'descripcion' => 'Gestione las líneas de investigación y sus descripciones.'],
+        ['titulo' => 'Grupos de investigación', 'ruta' => '/grupos-investigacion',
+         'descripcion' => 'Registre grupos y asócielos con universidades activas.'],
     ];
 
     ob_start();
@@ -28,7 +30,7 @@ function mostrarInicio(): void
         <div class="p-4 mb-4 bg-white border rounded-3 shadow-sm panel-portada">
             <h1 class="display-6 fw-bold">Panel de investigación</h1>
             <p class="mb-0 text-muted">
-                Seleccione cualquiera de los seis recursos para consultar o administrar sus registros.
+                Seleccione un recurso para consultar o administrar sus registros.
             </p>
         </div>
         <div class="row g-3">

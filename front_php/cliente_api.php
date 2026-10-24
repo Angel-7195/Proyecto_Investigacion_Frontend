@@ -25,7 +25,7 @@ function apiUrl(string $recurso = '', string $id = ''): string
 
 /**
  * Cliente HTTP genérico: conserva el contrato usado por el panel
- * de consulta de las seis entidades.
+ * de consulta de las entidades de Investigación.
  *
  * @return array{codigo:int, datos:array, error:string}
  */
@@ -242,4 +242,38 @@ function actualizarLineaInvestigacion(int $id, array $datos): array
 function retirarLineaInvestigacion(int $id): array
 {
     return adaptarRespuestaApi(llamarApi('DELETE', 'linea_investigacion', (string) $id));
+}
+
+// ----------------------------------------------------------------------
+// GRUPO DE INVESTIGACION - V2
+// ----------------------------------------------------------------------
+
+function listarGruposInvestigacion(): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'grupo_investigacion'));
+}
+
+function obtenerGrupoInvestigacion(int $id): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'grupo_investigacion', (string) $id));
+}
+
+function crearGrupoInvestigacion(array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('POST', 'grupo_investigacion', '', $datos));
+}
+
+function reemplazarGrupoInvestigacion(int $id, array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('PUT', 'grupo_investigacion', (string) $id, $datos));
+}
+
+function actualizarGrupoInvestigacion(int $id, array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('PATCH', 'grupo_investigacion', (string) $id, $datos));
+}
+
+function retirarGrupoInvestigacion(int $id): array
+{
+    return adaptarRespuestaApi(llamarApi('DELETE', 'grupo_investigacion', (string) $id));
 }
