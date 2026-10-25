@@ -1,7 +1,7 @@
 <?php
 /**
  * Front Controller del frontend de Investigación.
- * Conserva las rutas de V1 e incorpora Grupo de Investigación de V2.
+ * Conserva las rutas de V1 e incorpora Grupo de Investigación y Semillero de V2.
  * Las rutas HTTP públicas y los formularios permanecen sin cambios.
  */
 declare(strict_types=1);
@@ -42,6 +42,7 @@ $rutasPanel = [
     'universidad' => '/universidades',
     'linea_investigacion' => '/lineas-investigacion',
     'grupo_investigacion' => '/grupos-investigacion',
+    'semillero' => '/semilleros',
 ];
 
 if (($ruta === '/' || $ruta === '/index.php') && $metodo === 'GET') {
@@ -63,6 +64,7 @@ require __DIR__ . '/rutas/rutas_termino_clave.php';
 require __DIR__ . '/rutas/rutas_universidad.php';
 require __DIR__ . '/rutas/rutas_linea_investigacion.php';
 require __DIR__ . '/rutas/rutas_grupo_investigacion.php';
+require __DIR__ . '/rutas/rutas_semillero.php';
 
 // ----------------------------------------------------------------------
 // RUTA NO ENCONTRADA

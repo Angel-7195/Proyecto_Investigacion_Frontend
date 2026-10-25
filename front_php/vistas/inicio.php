@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/compartidas/plantilla.php';
 
-/** Panel principal de V1 con la primera entidad de V2. */
+/** Panel de las entidades de V1 y las primeras de V2. */
 function mostrarInicio(): void
 {
     $recursos = [
@@ -22,6 +22,8 @@ function mostrarInicio(): void
          'descripcion' => 'Gestione las líneas de investigación y sus descripciones.'],
         ['titulo' => 'Grupos de investigación', 'ruta' => '/grupos-investigacion',
          'descripcion' => 'Registre grupos y asócielos con universidades activas.'],
+        ['titulo' => 'Semilleros', 'ruta' => '/semilleros',
+         'descripcion' => 'Administre semilleros asociados con grupos de investigación activos.'],
     ];
 
     ob_start();

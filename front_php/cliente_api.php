@@ -277,3 +277,37 @@ function retirarGrupoInvestigacion(int $id): array
 {
     return adaptarRespuestaApi(llamarApi('DELETE', 'grupo_investigacion', (string) $id));
 }
+
+// ----------------------------------------------------------------------
+// SEMILLERO - V2
+// ----------------------------------------------------------------------
+
+function listarSemilleros(): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'semillero'));
+}
+
+function obtenerSemillero(int $id): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'semillero', (string) $id));
+}
+
+function crearSemillero(array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('POST', 'semillero', '', $datos));
+}
+
+function reemplazarSemillero(int $id, array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('PUT', 'semillero', (string) $id, $datos));
+}
+
+function actualizarSemillero(int $id, array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('PATCH', 'semillero', (string) $id, $datos));
+}
+
+function retirarSemillero(int $id): array
+{
+    return adaptarRespuestaApi(llamarApi('DELETE', 'semillero', (string) $id));
+}
