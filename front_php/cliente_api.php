@@ -311,3 +311,37 @@ function retirarSemillero(int $id): array
 {
     return adaptarRespuestaApi(llamarApi('DELETE', 'semillero', (string) $id));
 }
+
+// ----------------------------------------------------------------------
+// DOCENTE - V2
+// ----------------------------------------------------------------------
+
+function listarDocentes(): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'docente'));
+}
+
+function obtenerDocente(int $cedula): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'docente', (string) $cedula));
+}
+
+function crearDocente(array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('POST', 'docente', '', $datos));
+}
+
+function reemplazarDocente(int $cedula, array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('PUT', 'docente', (string) $cedula, $datos));
+}
+
+function actualizarDocente(int $cedula, array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('PATCH', 'docente', (string) $cedula, $datos));
+}
+
+function retirarDocente(int $cedula): array
+{
+    return adaptarRespuestaApi(llamarApi('DELETE', 'docente', (string) $cedula));
+}

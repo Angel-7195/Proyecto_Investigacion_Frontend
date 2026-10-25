@@ -24,6 +24,8 @@ function mostrarInicio(): void
          'descripcion' => 'Registre grupos y asócielos con universidades activas.'],
         ['titulo' => 'Semilleros', 'ruta' => '/semilleros',
          'descripcion' => 'Administre semilleros asociados con grupos de investigación activos.'],
+        ['titulo' => 'Docentes', 'ruta' => '/docentes',
+         'descripcion' => 'Gestione docentes, su perfil y su línea de investigación principal.'],
     ];
 
     ob_start();
