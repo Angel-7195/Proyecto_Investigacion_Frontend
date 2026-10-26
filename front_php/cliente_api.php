@@ -384,3 +384,37 @@ function retirarParticipacionGrupo(int $cedula, int $grupoId): array
 {
     return adaptarRespuestaApi(llamarApi('DELETE', 'participa_grupo', [(string) $cedula, (string) $grupoId]));
 }
+
+// ----------------------------------------------------------------------
+// PARTICIPA SEMILLERO - V2 (CLAVE PRIMARIA COMPUESTA)
+// ----------------------------------------------------------------------
+
+function listarParticipacionesSemillero(): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'participa_semillero'));
+}
+
+function obtenerParticipacionSemillero(int $cedula, int $semilleroId): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'participa_semillero', [(string) $cedula, (string) $semilleroId]));
+}
+
+function crearParticipacionSemillero(array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('POST', 'participa_semillero', '', $datos));
+}
+
+function reemplazarParticipacionSemillero(int $cedula, int $semilleroId, array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('PUT', 'participa_semillero', [(string) $cedula, (string) $semilleroId], $datos));
+}
+
+function actualizarParticipacionSemillero(int $cedula, int $semilleroId, array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('PATCH', 'participa_semillero', [(string) $cedula, (string) $semilleroId], $datos));
+}
+
+function retirarParticipacionSemillero(int $cedula, int $semilleroId): array
+{
+    return adaptarRespuestaApi(llamarApi('DELETE', 'participa_semillero', [(string) $cedula, (string) $semilleroId]));
+}
