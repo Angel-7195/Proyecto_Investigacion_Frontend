@@ -13,6 +13,10 @@ function renderizarPlantilla(string $titulo, string $contenido): void
         ['/terminos-clave', 'Términos clave'],
         ['/universidades', 'Universidades'],
         ['/lineas-investigacion', 'Líneas de investigación'],
+        ['/grupos-investigacion', 'Grupos de investigación'],
+        ['/semilleros', 'Semilleros'],
+        ['/docentes', 'Docentes'],
+        ['/participaciones-grupo', 'Participaciones en grupos'],
     ];
     ?>
     <!DOCTYPE html>
@@ -22,9 +26,10 @@ function renderizarPlantilla(string $titulo, string $contenido): void
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title><?= $tituloSeguro ?> | Investigación</title>
         <link rel="stylesheet" href="/publico/bootstrap.min.css">
+        <link rel="stylesheet" href="/publico/css/estilos.css?v=1">
     </head>
-    <body class="bg-light">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <body class="bg-light sitio-investigacion">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary barra-superior">
             <div class="container-fluid px-lg-4">
                 <a class="navbar-brand" href="/">Investigación</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -44,10 +49,10 @@ function renderizarPlantilla(string $titulo, string $contenido): void
                 </div>
             </div>
         </nav>
-        <main class="container py-4">
+        <main class="container py-4 contenido-principal">
             <?= $contenido ?>
         </main>
-        <footer class="border-top bg-white py-3 mt-5">
+        <footer class="border-top bg-white py-3 mt-5 pie-sitio">
             <div class="container text-center text-muted">Módulo de Investigación</div>
         </footer>
         <script src="/publico/bootstrap.bundle.min.js"></script>

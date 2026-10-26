@@ -1,0 +1,205 @@
+/*
+ * Estilos de la interfaz del modulo de Investigacion.
+ * Bootstrap sigue siendo la base; este archivo ajusta la presentacion.
+ * No agrega dependencias ni modifica el comportamiento de los CRUD.
+ */
+
+:root {
+    --interfaz-fondo: #f5f7fb;
+    --interfaz-texto: #253044;
+    --interfaz-borde: #dfe5ee;
+    --interfaz-radio: 0.8rem;
+    --interfaz-sombra: 0 4px 18px rgb(27 39 59 / 7%);
+    --interfaz-sombra-hover: 0 12px 28px rgb(27 39 59 / 12%);
+}
+
+body.sitio-investigacion {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--interfaz-fondo) !important;
+    color: var(--interfaz-texto);
+    line-height: 1.55;
+}
+
+.barra-superior {
+    box-shadow: 0 3px 14px rgb(18 39 73 / 14%);
+}
+
+.barra-superior .navbar-brand {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.barra-superior .nav-link {
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.7rem;
+    transition: background-color 160ms ease, color 160ms ease;
+}
+
+.barra-superior .nav-link:hover,
+.barra-superior .nav-link:focus-visible {
+    color: #fff;
+    background-color: rgb(255 255 255 / 16%);
+}
+
+.contenido-principal {
+    flex: 1 0 auto;
+    width: 100%;
+}
+
+.contenido-principal h1,
+.contenido-principal h2 {
+    letter-spacing: -0.025em;
+}
+
+.panel-portada {
+    border-left: 4px solid var(--bs-primary);
+    background: linear-gradient(115deg, #fff 66%, #f0f5ff) !important;
+    border-radius: var(--interfaz-radio) !important;
+}
+
+.panel-portada h1 {
+    line-height: 1.15;
+}
+
+.contenido-principal .card {
+    border: 1px solid var(--interfaz-borde);
+    border-radius: var(--interfaz-radio);
+    box-shadow: var(--interfaz-sombra) !important;
+}
+
+.tarjeta-recurso {
+    transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.tarjeta-recurso:hover,
+.tarjeta-recurso:focus-within {
+    transform: translateY(-3px);
+    box-shadow: var(--interfaz-sombra-hover) !important;
+}
+
+.tarjeta-recurso .card-body {
+    padding: 1.4rem;
+}
+
+.tarjeta-recurso .card-title {
+    font-weight: 650;
+    margin-bottom: 0.7rem;
+}
+
+.contenido-principal .btn {
+    border-radius: 0.6rem;
+    font-weight: 550;
+    padding: 0.55rem 0.95rem;
+    transition: box-shadow 160ms ease, transform 160ms ease;
+}
+
+.contenido-principal .btn-sm {
+    padding: 0.3rem 0.65rem;
+}
+
+.contenido-principal .btn:hover {
+    transform: translateY(-1px);
+}
+
+.contenido-principal .btn:focus-visible,
+.barra-superior .nav-link:focus-visible,
+.barra-superior .navbar-brand:focus-visible {
+    outline: 3px solid #ffdb70;
+    outline-offset: 3px;
+}
+
+.contenido-principal .form-label {
+    font-weight: 600;
+    color: var(--interfaz-texto);
+}
+
+.contenido-principal .form-control,
+.contenido-principal .form-select {
+    border-color: #cbd5e1;
+    border-radius: 0.6rem;
+    min-height: 2.65rem;
+}
+
+.contenido-principal textarea.form-control {
+    min-height: 6rem;
+}
+
+.contenido-principal .form-control:focus,
+.contenido-principal .form-select:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgb(13 110 253 / 16%);
+}
+
+.contenido-principal .form-text {
+    color: #526277;
+}
+
+.contenido-principal .table-responsive {
+    border: 1px solid var(--interfaz-borde);
+    border-radius: var(--interfaz-radio);
+    box-shadow: var(--interfaz-sombra);
+    overflow-x: auto;
+}
+
+.contenido-principal .table {
+    margin-bottom: 0;
+    font-size: 0.96rem;
+}
+
+.contenido-principal .table > :not(caption) > * > * {
+    padding: 0.85rem 0.9rem;
+    vertical-align: middle;
+}
+
+.contenido-principal .table-dark {
+    --bs-table-bg: #253650;
+    --bs-table-border-color: #384b69;
+}
+
+.contenido-principal .alert {
+    border-radius: 0.65rem;
+    line-height: 1.5;
+}
+
+.pie-sitio {
+    flex-shrink: 0;
+    color: #5b6778;
+}
+
+@media (max-width: 767.98px) {
+    .contenido-principal {
+        padding-top: 1.1rem !important;
+    }
+
+    .panel-portada {
+        padding: 1.3rem !important;
+    }
+
+    .panel-portada h1 {
+        font-size: clamp(1.7rem, 7vw, 2.5rem);
+    }
+
+    .tarjeta-recurso .card-body {
+        padding: 1.15rem;
+    }
+
+    .contenido-principal .table {
+        font-size: 0.9rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .barra-superior .nav-link,
+    .tarjeta-recurso,
+    .contenido-principal .btn {
+        transition: none;
+    }
+
+    .tarjeta-recurso:hover,
+    .tarjeta-recurso:focus-within,
+    .contenido-principal .btn:hover {
+        transform: none;
+    }
+}

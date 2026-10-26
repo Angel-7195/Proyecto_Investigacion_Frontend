@@ -6,7 +6,7 @@ declare(strict_types=1);
  * Construye las URL de la API sin acceder directamente a MariaDB.
  * En Docker, URL_API debe apuntar al servicio api-investigacion.
  */
-function apiUrl(string $recurso = '', string $id = ''): string
+function apiUrl(string $recurso = '', string|array $id = ''): string
 {
     $base = getenv('URL_API');
 
@@ -16,7 +16,12 @@ function apiUrl(string $recurso = '', string $id = ''): string
 
     $url = rtrim($base, '/') . '/api/' . rawurlencode($recurso);
 
-    if ($id !== '') {
+    // Un arreglo representa segmentos individuales de una clave compuesta.
+    if (is_array($id)) {
+        foreach ($id as $parte) {
+            $url .= '/' . rawurlencode((string) $parte);
+        }
+    } elseif ($id !== '') {
         $url .= '/' . rawurlencode($id);
     }
 
@@ -25,14 +30,14 @@ function apiUrl(string $recurso = '', string $id = ''): string
 
 /**
  * Cliente HTTP genérico: conserva el contrato usado por el panel
- * de consulta de las seis entidades.
+ * de consulta de las entidades de Investigación.
  *
  * @return array{codigo:int, datos:array, error:string}
  */
 function llamarApi(
     string $metodo,
     string $recurso,
-    string $id = '',
+    string|array $id = '',
     ?array $datos = null
 ): array {
     $url = apiUrl($recurso, $id);
@@ -242,4 +247,140 @@ function actualizarLineaInvestigacion(int $id, array $datos): array
 function retirarLineaInvestigacion(int $id): array
 {
     return adaptarRespuestaApi(llamarApi('DELETE', 'linea_investigacion', (string) $id));
+}
+
+// ----------------------------------------------------------------------
+// GRUPO DE INVESTIGACION - V2
+// ----------------------------------------------------------------------
+
+function listarGruposInvestigacion(): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'grupo_investigacion'));
+}
+
+function obtenerGrupoInvestigacion(int $id): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'grupo_investigacion', (string) $id));
+}
+
+function crearGrupoInvestigacion(array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('POST', 'grupo_investigacion', '', $datos));
+}
+
+function reemplazarGrupoInvestigacion(int $id, array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('PUT', 'grupo_investigacion', (string) $id, $datos));
+}
+
+function actualizarGrupoInvestigacion(int $id, array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('PATCH', 'grupo_investigacion', (string) $id, $datos));
+}
+
+function retirarGrupoInvestigacion(int $id): array
+{
+    return adaptarRespuestaApi(llamarApi('DELETE', 'grupo_investigacion', (string) $id));
+}
+
+// ----------------------------------------------------------------------
+// SEMILLERO - V2
+// ----------------------------------------------------------------------
+
+function listarSemilleros(): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'semillero'));
+}
+
+function obtenerSemillero(int $id): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'semillero', (string) $id));
+}
+
+function crearSemillero(array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('POST', 'semillero', '', $datos));
+}
+
+function reemplazarSemillero(int $id, array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('PUT', 'semillero', (string) $id, $datos));
+}
+
+function actualizarSemillero(int $id, array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('PATCH', 'semillero', (string) $id, $datos));
+}
+
+function retirarSemillero(int $id): array
+{
+    return adaptarRespuestaApi(llamarApi('DELETE', 'semillero', (string) $id));
+}
+
+// ----------------------------------------------------------------------
+// DOCENTE - V2
+// ----------------------------------------------------------------------
+
+function listarDocentes(): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'docente'));
+}
+
+function obtenerDocente(int $cedula): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'docente', (string) $cedula));
+}
+
+function crearDocente(array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('POST', 'docente', '', $datos));
+}
+
+function reemplazarDocente(int $cedula, array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('PUT', 'docente', (string) $cedula, $datos));
+}
+
+function actualizarDocente(int $cedula, array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('PATCH', 'docente', (string) $cedula, $datos));
+}
+
+function retirarDocente(int $cedula): array
+{
+    return adaptarRespuestaApi(llamarApi('DELETE', 'docente', (string) $cedula));
+}
+
+// ----------------------------------------------------------------------
+// PARTICIPA GRUPO - V2 (CLAVE PRIMARIA COMPUESTA)
+// ----------------------------------------------------------------------
+
+function listarParticipacionesGrupo(): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'participa_grupo'));
+}
+
+function obtenerParticipacionGrupo(int $cedula, int $grupoId): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'participa_grupo', [(string) $cedula, (string) $grupoId]));
+}
+
+function crearParticipacionGrupo(array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('POST', 'participa_grupo', '', $datos));
+}
+
+function reemplazarParticipacionGrupo(int $cedula, int $grupoId, array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('PUT', 'participa_grupo', [(string) $cedula, (string) $grupoId], $datos));
+}
+
+function actualizarParticipacionGrupo(int $cedula, int $grupoId, array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('PATCH', 'participa_grupo', [(string) $cedula, (string) $grupoId], $datos));
+}
+
+function retirarParticipacionGrupo(int $cedula, int $grupoId): array
+{
+    return adaptarRespuestaApi(llamarApi('DELETE', 'participa_grupo', [(string) $cedula, (string) $grupoId]));
 }
