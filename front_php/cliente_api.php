@@ -6,7 +6,7 @@ declare(strict_types=1);
  * Construye las URL de la API sin acceder directamente a MariaDB.
  * En Docker, URL_API debe apuntar al servicio api-investigacion.
  */
-function apiUrl(string $recurso = '', string $id = ''): string
+function apiUrl(string $recurso = '', string|array $id = ''): string
 {
     $base = getenv('URL_API');
 
@@ -16,7 +16,12 @@ function apiUrl(string $recurso = '', string $id = ''): string
 
     $url = rtrim($base, '/') . '/api/' . rawurlencode($recurso);
 
-    if ($id !== '') {
+    // Un arreglo representa segmentos individuales de una clave compuesta.
+    if (is_array($id)) {
+        foreach ($id as $parte) {
+            $url .= '/' . rawurlencode((string) $parte);
+        }
+    } elseif ($id !== '') {
         $url .= '/' . rawurlencode($id);
     }
 
@@ -32,7 +37,7 @@ function apiUrl(string $recurso = '', string $id = ''): string
 function llamarApi(
     string $metodo,
     string $recurso,
-    string $id = '',
+    string|array $id = '',
     ?array $datos = null
 ): array {
     $url = apiUrl($recurso, $id);
@@ -344,4 +349,38 @@ function actualizarDocente(int $cedula, array $datos): array
 function retirarDocente(int $cedula): array
 {
     return adaptarRespuestaApi(llamarApi('DELETE', 'docente', (string) $cedula));
+}
+
+// ----------------------------------------------------------------------
+// PARTICIPA GRUPO - V2 (CLAVE PRIMARIA COMPUESTA)
+// ----------------------------------------------------------------------
+
+function listarParticipacionesGrupo(): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'participa_grupo'));
+}
+
+function obtenerParticipacionGrupo(int $cedula, int $grupoId): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'participa_grupo', [(string) $cedula, (string) $grupoId]));
+}
+
+function crearParticipacionGrupo(array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('POST', 'participa_grupo', '', $datos));
+}
+
+function reemplazarParticipacionGrupo(int $cedula, int $grupoId, array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('PUT', 'participa_grupo', [(string) $cedula, (string) $grupoId], $datos));
+}
+
+function actualizarParticipacionGrupo(int $cedula, int $grupoId, array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('PATCH', 'participa_grupo', [(string) $cedula, (string) $grupoId], $datos));
+}
+
+function retirarParticipacionGrupo(int $cedula, int $grupoId): array
+{
+    return adaptarRespuestaApi(llamarApi('DELETE', 'participa_grupo', [(string) $cedula, (string) $grupoId]));
 }

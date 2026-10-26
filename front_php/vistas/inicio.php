@@ -26,6 +26,8 @@ function mostrarInicio(): void
          'descripcion' => 'Administre semilleros asociados con grupos de investigación activos.'],
         ['titulo' => 'Docentes', 'ruta' => '/docentes',
          'descripcion' => 'Gestione docentes, su perfil y su línea de investigación principal.'],
+        ['titulo' => 'Participaciones en grupos', 'ruta' => '/participaciones-grupo',
+         'descripcion' => 'Asocie docentes con grupos de investigación, sus roles y fechas de participación.'],
     ];
 
     ob_start();

@@ -16,6 +16,7 @@ function renderizarPlantilla(string $titulo, string $contenido): void
         ['/grupos-investigacion', 'Grupos de investigación'],
         ['/semilleros', 'Semilleros'],
         ['/docentes', 'Docentes'],
+        ['/participaciones-grupo', 'Participaciones en grupos'],
     ];
     ?>
     <!DOCTYPE html>
