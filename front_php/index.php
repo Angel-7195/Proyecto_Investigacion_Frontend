@@ -1,7 +1,7 @@
 <?php
 /**
  * Front Controller del frontend de Investigación.
- * Conserva las rutas de V1 e incorpora Grupo, Semillero, Docente y Participa Grupo de V2.
+ * Conserva las rutas de V1 e incorpora Grupo, Semillero, Docente y las dos participaciones de V2.
  * Las rutas HTTP públicas y los formularios permanecen sin cambios.
  */
 declare(strict_types=1);
@@ -45,6 +45,7 @@ $rutasPanel = [
     'semillero' => '/semilleros',
     'docente' => '/docentes',
     'participa_grupo' => '/participaciones-grupo',
+    'participa_semillero' => '/participaciones-semillero',
 ];
 
 if (($ruta === '/' || $ruta === '/index.php') && $metodo === 'GET') {
@@ -69,6 +70,7 @@ require __DIR__ . '/rutas/rutas_grupo_investigacion.php';
 require __DIR__ . '/rutas/rutas_semillero.php';
 require __DIR__ . '/rutas/rutas_docente.php';
 require __DIR__ . '/rutas/rutas_participa_grupo.php';
+require __DIR__ . '/rutas/rutas_participa_semillero.php';
 
 // ----------------------------------------------------------------------
 // RUTA NO ENCONTRADA

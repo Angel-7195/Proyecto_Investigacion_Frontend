@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/compartidas/plantilla.php';
 
-/** Panel de las entidades de V1 y las primeras de V2. */
+/** Panel de las entidades de V1 y las entidades de V2 disponibles. */
 function mostrarInicio(): void
 {
     $recursos = [
@@ -28,6 +28,8 @@ function mostrarInicio(): void
          'descripcion' => 'Gestione docentes, su perfil y su línea de investigación principal.'],
         ['titulo' => 'Participaciones en grupos', 'ruta' => '/participaciones-grupo',
          'descripcion' => 'Asocie docentes con grupos de investigación, sus roles y fechas de participación.'],
+        ['titulo' => 'Participaciones en semilleros', 'ruta' => '/participaciones-semillero',
+         'descripcion' => 'Asocie docentes con semilleros, roles y fechas de participación.'],
     ];
 
     ob_start();
