@@ -30,6 +30,16 @@ function mostrarInicio(): void
          'descripcion' => 'Asocie docentes con grupos de investigación, sus roles y fechas de participación.'],
         ['titulo' => 'Participaciones en semilleros', 'ruta' => '/participaciones-semillero',
          'descripcion' => 'Asocie docentes con semilleros, roles y fechas de participación.'],
+        ['titulo' => 'Áreas de conocimiento por línea', 'ruta' => '/asociaciones-ac-linea',
+         'descripcion' => 'Relacione líneas de investigación con áreas de conocimiento activas.'],
+        ['titulo' => 'ODS por línea de investigación', 'ruta' => '/asociaciones-ods-linea',
+         'descripcion' => 'Asocie líneas de investigación con Objetivos de Desarrollo Sostenible activos.'],
+        ['titulo' => 'Áreas de aplicación por línea', 'ruta' => '/asociaciones-aa-linea',
+         'descripcion' => 'Relacione áreas de aplicación activas con líneas de investigación.'],
+        ['titulo' => 'Grupos de investigación por línea', 'ruta' => '/asociaciones-grupo-linea',
+         'descripcion' => 'Relacione grupos de investigación activos con líneas de investigación.'],
+        ['titulo' => 'Semilleros por línea de investigación', 'ruta' => '/asociaciones-semillero-linea',
+         'descripcion' => 'Relacione semilleros activos con líneas de investigación.'],
     ];
 
     ob_start();

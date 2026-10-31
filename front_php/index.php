@@ -1,7 +1,7 @@
 <?php
 /**
  * Front Controller del frontend de Investigación.
- * Conserva las rutas de V1 e incorpora Grupo, Semillero, Docente y las dos participaciones de V2.
+ * Conserva las rutas de V1 e incorpora las entidades V2 y las asociaciones ac_linea, ods_linea, aa_linea , grupo_linea y semillero_linea.
  * Las rutas HTTP públicas y los formularios permanecen sin cambios.
  */
 declare(strict_types=1);
@@ -46,6 +46,11 @@ $rutasPanel = [
     'docente' => '/docentes',
     'participa_grupo' => '/participaciones-grupo',
     'participa_semillero' => '/participaciones-semillero',
+    'ac_linea' => '/asociaciones-ac-linea',
+    'ods_linea' => '/asociaciones-ods-linea',
+    'aa_linea' => '/asociaciones-aa-linea',
+    'grupo_linea' => '/asociaciones-grupo-linea',
+    'semillero_linea' => '/asociaciones-semillero-linea',
 ];
 
 if (($ruta === '/' || $ruta === '/index.php') && $metodo === 'GET') {
@@ -71,6 +76,11 @@ require __DIR__ . '/rutas/rutas_semillero.php';
 require __DIR__ . '/rutas/rutas_docente.php';
 require __DIR__ . '/rutas/rutas_participa_grupo.php';
 require __DIR__ . '/rutas/rutas_participa_semillero.php';
+require __DIR__ . '/rutas/rutas_ac_linea.php';
+require __DIR__ . '/rutas/rutas_ods_linea.php';
+require __DIR__ . '/rutas/rutas_aa_linea.php';
+require __DIR__ . '/rutas/rutas_grupo_linea.php';
+require __DIR__ . '/rutas/rutas_semillero_linea.php';
 
 // ----------------------------------------------------------------------
 // RUTA NO ENCONTRADA

@@ -18,6 +18,11 @@ function renderizarPlantilla(string $titulo, string $contenido): void
         ['/docentes', 'Docentes'],
         ['/participaciones-grupo', 'Participaciones en grupos'],
         ['/participaciones-semillero', 'Participaciones en semilleros'],
+        ['/asociaciones-ac-linea', 'Áreas por línea'],
+        ['/asociaciones-ods-linea', 'ODS por línea'],
+        ['/asociaciones-aa-linea', 'Aplicaciones por línea'],
+        ['/asociaciones-grupo-linea', 'Grupos por línea'],
+        ['/asociaciones-semillero-linea', 'Semilleros por línea'],
     ];
     ?>
     <!DOCTYPE html>

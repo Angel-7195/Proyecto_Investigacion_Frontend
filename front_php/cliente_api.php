@@ -418,3 +418,150 @@ function retirarParticipacionSemillero(int $cedula, int $semilleroId): array
 {
     return adaptarRespuestaApi(llamarApi('DELETE', 'participa_semillero', [(string) $cedula, (string) $semilleroId]));
 }
+
+
+// ----------------------------------------------------------------------
+// AC LINEA - V2 (CLAVE COMPUESTA: INT + VARCHAR(6))
+// Solo GET, POST y DELETE. PUT/PATCH no tienen campos editables.
+// ----------------------------------------------------------------------
+
+function listarAreasConocimientoAcLinea(): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'area_conocimiento'));
+}
+
+function listarAsociacionesAcLinea(): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'ac_linea'));
+}
+
+function obtenerAsociacionAcLinea(int $lineaId, string $areaId): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'ac_linea', [(string) $lineaId, $areaId]));
+}
+
+function crearAsociacionAcLinea(array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('POST', 'ac_linea', '', $datos));
+}
+
+function retirarAsociacionAcLinea(int $lineaId, string $areaId): array
+{
+    return adaptarRespuestaApi(llamarApi('DELETE', 'ac_linea', [(string) $lineaId, $areaId]));
+}
+
+
+// ----------------------------------------------------------------------
+// ODS LINEA - V2 (CLAVE COMPUESTA: INT + INT)
+// Solo GET, POST y DELETE. PUT/PATCH no tienen campos editables.
+// ----------------------------------------------------------------------
+
+/** Catálogo de los 17 ODS y los que se hayan registrado posteriormente. */
+function listarObjetivosDesarrolloSostenibleOdsLinea(): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'objetivo_desarrollo_sostenible'));
+}
+
+function listarAsociacionesOdsLinea(): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'ods_linea'));
+}
+
+function obtenerAsociacionOdsLinea(int $lineaId, int $odsId): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'ods_linea', [(string) $lineaId, (string) $odsId]));
+}
+
+function crearAsociacionOdsLinea(array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('POST', 'ods_linea', '', $datos));
+}
+
+function retirarAsociacionOdsLinea(int $lineaId, int $odsId): array
+{
+    return adaptarRespuestaApi(llamarApi('DELETE', 'ods_linea', [(string) $lineaId, (string) $odsId]));
+}
+
+
+// ----------------------------------------------------------------------
+// AA LINEA - V2 (PK COMPUESTA: AREA_APLICACION INT + LINEA_INVESTIGACION INT)
+// GET, POST y DELETE; la asociación no tiene campos editables.
+// ----------------------------------------------------------------------
+
+/** Catálogo de áreas de aplicación activas para el selector. */
+function listarAreasAplicacionAaLinea(): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'area_aplicacion'));
+}
+
+function listarAsociacionesAaLinea(): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'aa_linea'));
+}
+
+function obtenerAsociacionAaLinea(int $areaId, int $lineaId): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'aa_linea', [(string) $areaId, (string) $lineaId]));
+}
+
+function crearAsociacionAaLinea(array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('POST', 'aa_linea', '', $datos));
+}
+
+function retirarAsociacionAaLinea(int $areaId, int $lineaId): array
+{
+    return adaptarRespuestaApi(llamarApi('DELETE', 'aa_linea', [(string) $areaId, (string) $lineaId]));
+}
+
+
+// ----------------------------------------------------------------------
+// GRUPO LINEA - V2 (PK COMPUESTA: GRUPO_INVESTIGACION INT + LINEA_INVESTIGACION INT)
+// Solo GET, POST y DELETE: las claves primarias no admiten edición.
+// ----------------------------------------------------------------------
+
+function listarAsociacionesGrupoLinea(): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'grupo_linea'));
+}
+
+function obtenerAsociacionGrupoLinea(int $grupoId, int $lineaId): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'grupo_linea', [(string) $grupoId, (string) $lineaId]));
+}
+
+function crearAsociacionGrupoLinea(array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('POST', 'grupo_linea', '', $datos));
+}
+
+function retirarAsociacionGrupoLinea(int $grupoId, int $lineaId): array
+{
+    return adaptarRespuestaApi(llamarApi('DELETE', 'grupo_linea', [(string) $grupoId, (string) $lineaId]));
+}
+
+
+// ----------------------------------------------------------------------
+// SEMILLERO LINEA - V2 (PK COMPUESTA: SEMILLERO INT + LINEA_INVESTIGACION INT)
+// Solo GET, POST y DELETE; las claves primarias no son editables.
+// ----------------------------------------------------------------------
+
+function listarAsociacionesSemilleroLinea(): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'semillero_linea'));
+}
+
+function obtenerAsociacionSemilleroLinea(int $semilleroId, int $lineaId): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'semillero_linea', [(string) $semilleroId, (string) $lineaId]));
+}
+
+function crearAsociacionSemilleroLinea(array $datos): array
+{
+    return adaptarRespuestaApi(llamarApi('POST', 'semillero_linea', '', $datos));
+}
+
+function retirarAsociacionSemilleroLinea(int $semilleroId, int $lineaId): array
+{
+    return adaptarRespuestaApi(llamarApi('DELETE', 'semillero_linea', [(string) $semilleroId, (string) $lineaId]));
+}
