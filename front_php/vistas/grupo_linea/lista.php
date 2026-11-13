@@ -13,6 +13,9 @@ function escaparGrupoLinea(mixed $valor): string
 /** Muestra la lista de relaciones activas con nombres legibles. */
 function mostrarListaGrupoLinea(array $errores = []): void
 {
+    // Los permisos visuales complementan la autorización del backend.
+    $rolesVista = $_SESSION['usuario']['roles'] ?? [];
+    $esAdminVista = is_array($rolesVista) && in_array('admin', $rolesVista, true);
     $respuesta = listarAsociacionesGrupoLinea();
     $asociaciones = [];
     if ($respuesta['correcta']) {
@@ -55,9 +58,11 @@ function mostrarListaGrupoLinea(array $errores = []): void
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
         <div>
             <h1 class="h2 mb-1">Grupos de investigación por línea</h1>
-            <p class="text-muted mb-0">Administre las relaciones entre grupos de investigación y líneas de investigación.</p>
+            <p class="text-muted mb-0"><?= $esAdminVista ? 'Administre las relaciones entre grupos de investigación y líneas de investigación.' : 'Consulte los registros del módulo.' ?></p>
         </div>
+        <?php if ($esAdminVista): ?>
         <a class="btn btn-primary" href="/asociaciones-grupo-linea/nuevo">Registrar asociación</a>
+        <?php endif; ?>
     </div>
 
     <?php if ($mensaje !== ''): ?>
@@ -79,7 +84,7 @@ function mostrarListaGrupoLinea(array $errores = []): void
                 <thead class="table-dark"><tr>
                     <th scope="col">Grupo de investigación</th>
                     <th scope="col">Línea de investigación</th>
-                    <th scope="col">Acciones</th>
+                    <th scope="col"><?= $esAdminVista ? 'Acciones' : 'Detalle' ?></th>
                 </tr></thead>
                 <tbody>
                 <?php foreach ($asociaciones as $asociacion): ?>
@@ -100,12 +105,14 @@ function mostrarListaGrupoLinea(array $errores = []): void
                         <td>
                             <div class="d-flex flex-wrap gap-2">
                                 <a class="btn btn-outline-primary btn-sm" href="<?= escaparGrupoLinea($urlVer) ?>">Ver detalle</a>
+                                <?php if ($esAdminVista): ?>
                                 <form method="post" action="/asociaciones-grupo-linea/retirar"
                                       onsubmit="return confirm('¿Retirar esta asociación?');">
                                     <input type="hidden" name="grupo_investigacion" value="<?= escaparGrupoLinea($grupoId) ?>">
                                     <input type="hidden" name="linea_investigacion" value="<?= escaparGrupoLinea($lineaId) ?>">
                                     <button type="submit" class="btn btn-outline-danger btn-sm">Retirar</button>
                                 </form>
+                                <?php endif; ?>
                             </div>
                         </td>
                     </tr>
@@ -113,7 +120,7 @@ function mostrarListaGrupoLinea(array $errores = []): void
                 </tbody>
             </table>
         </div>
-        <p class="text-muted small">Las claves de esta asociación no se pueden editar. Para cambiar la relación, registre otra y retire la anterior.</p>
+        <p class="text-muted small">Las claves de esta asociación no se pueden editar.<?php if ($esAdminVista): ?> Para cambiar la relación, registre otra y retire la anterior.<?php endif; ?></p>
     <?php endif; ?>
     <?php
     renderizarPlantilla('Grupos de investigación por línea', (string) ob_get_clean());

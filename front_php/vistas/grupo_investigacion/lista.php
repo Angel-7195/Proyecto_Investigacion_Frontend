@@ -16,6 +16,9 @@ function escaparGrupoInvestigacion(mixed $valor): string
  */
 function mostrarListaGruposInvestigacion(array $errores = []): void
 {
+    // Los permisos visuales complementan la autorización del backend.
+    $rolesVista = $_SESSION['usuario']['roles'] ?? [];
+    $esAdminVista = is_array($rolesVista) && in_array('admin', $rolesVista, true);
     $respuesta = listarGruposInvestigacion();
     $grupos = [];
     $codigo = $respuesta['estado'];
@@ -53,9 +56,11 @@ function mostrarListaGruposInvestigacion(array $errores = []): void
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
         <div>
             <h1 class="h2 mb-1">Grupos de investigación</h1>
-            <p class="text-muted mb-0">Administre los grupos y sus universidades relacionadas.</p>
+            <p class="text-muted mb-0"><?= $esAdminVista ? 'Administre los grupos y sus universidades relacionadas.' : 'Consulte los registros del módulo.' ?></p>
         </div>
+        <?php if ($esAdminVista): ?>
         <a href="/grupos-investigacion/nuevo" class="btn btn-primary">Registrar grupo</a>
+        <?php endif; ?>
     </div>
 
     <?php if ($mensaje !== ''): ?>
@@ -84,7 +89,9 @@ function mostrarListaGruposInvestigacion(array $errores = []): void
                         <th scope="col">Universidad</th>
                         <th scope="col">Interno</th>
                         <th scope="col">Ámbito</th>
+                        <?php if ($esAdminVista): ?>
                         <th scope="col">Acciones</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
@@ -104,6 +111,7 @@ function mostrarListaGruposInvestigacion(array $errores = []): void
                             <td><?= escaparGrupoInvestigacion($universidadTexto) ?></td>
                             <td><?= (int) ($grupo['interno'] ?? 0) === 1 ? 'Sí' : 'No' ?></td>
                             <td><?= escaparGrupoInvestigacion($grupo['ambito'] ?? '') ?></td>
+                            <?php if ($esAdminVista): ?>
                             <td>
                                 <div class="d-flex flex-wrap gap-2">
                                     <a class="btn btn-outline-primary btn-sm"
@@ -115,6 +123,7 @@ function mostrarListaGruposInvestigacion(array $errores = []): void
                                     </form>
                                 </div>
                             </td>
+                            <?php endif; ?>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

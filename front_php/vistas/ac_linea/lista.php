@@ -13,6 +13,9 @@ function escaparAcLinea(mixed $valor): string
 /** Lista asociaciones activas, con los nombres de ambos catálogos cuando existan. */
 function mostrarListaAcLinea(array $errores = []): void
 {
+    // Los permisos visuales complementan la autorización del backend.
+    $rolesVista = $_SESSION['usuario']['roles'] ?? [];
+    $esAdminVista = is_array($rolesVista) && in_array('admin', $rolesVista, true);
     $respuesta = listarAsociacionesAcLinea();
     $asociaciones = [];
     if ($respuesta['correcta']) {
@@ -59,9 +62,11 @@ function mostrarListaAcLinea(array $errores = []): void
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
         <div>
             <h1 class="h2 mb-1">Áreas de conocimiento por línea</h1>
-            <p class="text-muted mb-0">Administre las relaciones entre líneas de investigación y áreas de conocimiento.</p>
+            <p class="text-muted mb-0"><?= $esAdminVista ? 'Administre las relaciones entre líneas de investigación y áreas de conocimiento.' : 'Consulte los registros del módulo.' ?></p>
         </div>
+        <?php if ($esAdminVista): ?>
         <a class="btn btn-primary" href="/asociaciones-ac-linea/nuevo">Registrar asociación</a>
+        <?php endif; ?>
     </div>
 
     <?php if ($mensaje !== ''): ?>
@@ -83,7 +88,7 @@ function mostrarListaAcLinea(array $errores = []): void
                 <thead class="table-dark"><tr>
                     <th scope="col">Línea de investigación</th>
                     <th scope="col">Área de conocimiento</th>
-                    <th scope="col">Acciones</th>
+                    <th scope="col"><?= $esAdminVista ? 'Acciones' : 'Detalle' ?></th>
                 </tr></thead>
                 <tbody>
                 <?php foreach ($asociaciones as $asociacion): ?>
@@ -104,12 +109,14 @@ function mostrarListaAcLinea(array $errores = []): void
                         <td>
                             <div class="d-flex flex-wrap gap-2">
                                 <a class="btn btn-outline-primary btn-sm" href="<?= escaparAcLinea($urlVer) ?>">Ver detalle</a>
+                                <?php if ($esAdminVista): ?>
                                 <form method="post" action="/asociaciones-ac-linea/retirar"
                                       onsubmit="return confirm('¿Retirar esta asociación?');">
                                     <input type="hidden" name="linea_investigacion" value="<?= escaparAcLinea($lineaId) ?>">
                                     <input type="hidden" name="area_conocimiento" value="<?= escaparAcLinea($areaId) ?>">
                                     <button type="submit" class="btn btn-outline-danger btn-sm">Retirar</button>
                                 </form>
+                                <?php endif; ?>
                             </div>
                         </td>
                     </tr>
@@ -117,7 +124,7 @@ function mostrarListaAcLinea(array $errores = []): void
                 </tbody>
             </table>
         </div>
-        <p class="text-muted small">Las claves de esta asociación no se pueden editar. Para cambiar la relación, registre otra y retire la anterior.</p>
+        <p class="text-muted small">Las claves de esta asociación no se pueden editar.<?php if ($esAdminVista): ?> Para cambiar la relación, registre otra y retire la anterior.<?php endif; ?></p>
     <?php endif; ?>
     <?php
     renderizarPlantilla('Áreas de conocimiento por línea', (string) ob_get_clean());

@@ -12,6 +12,11 @@ require_once __DIR__ . '/../../cliente_api.php';
  */
 function mostrarListaLineasInvestigacion(): void
 {
+    // Los botones administrativos solo se muestran al rol admin.
+    // La API continúa siendo responsable de autorizar cada operación.
+    $roles = $_SESSION['usuario']['roles'] ?? [];
+    $esAdmin = is_array($roles) && in_array('admin', $roles, true);
+
     $respuesta = listarLineasInvestigacion();
 
     ob_start();
@@ -23,13 +28,17 @@ function mostrarListaLineasInvestigacion(): void
             <h1 class="h2">Líneas de investigación</h1>
 
             <p class="text-muted mb-0">
-                Consulte y administre las líneas de investigación registradas.
+                <?= $esAdmin
+                    ? 'Consulte y administre las líneas de investigación registradas.'
+                    : 'Consulte las líneas de investigación registradas.' ?>
             </p>
         </div>
 
-        <a href="/lineas-investigacion/nuevo" class="btn btn-primary">
-            Registrar línea
-        </a>
+        <?php if ($esAdmin): ?>
+            <a href="/lineas-investigacion/nuevo" class="btn btn-primary">
+                Registrar línea
+            </a>
+        <?php endif; ?>
 
     </div>
 
@@ -47,9 +56,11 @@ function mostrarListaLineasInvestigacion(): void
             Todavía no hay líneas de investigación registradas.
         </div>
 
-        <a href="/lineas-investigacion/nuevo" class="btn btn-primary">
-            Registrar primera línea
-        </a>
+        <?php if ($esAdmin): ?>
+            <a href="/lineas-investigacion/nuevo" class="btn btn-primary">
+                Registrar primera línea
+            </a>
+        <?php endif; ?>
 
     <?php elseif (!$respuesta['correcta']): ?>
 
@@ -76,7 +87,9 @@ function mostrarListaLineasInvestigacion(): void
                             <th>ID</th>
                             <th>Nombre</th>
                             <th>Descripción</th>
-                            <th class="text-end">Acciones</th>
+                            <?php if ($esAdmin): ?>
+                                <th class="text-end">Acciones</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
 
@@ -114,6 +127,7 @@ function mostrarListaLineasInvestigacion(): void
                                     ) ?>
                                 </td>
 
+                                <?php if ($esAdmin): ?>
                                 <td class="text-end">
                                     <a
                                         href="/lineas-investigacion/editar?id=<?= rawurlencode((string) $id) ?>"
@@ -146,6 +160,7 @@ function mostrarListaLineasInvestigacion(): void
                                         </button>
                                     </form>
                                 </td>
+                                <?php endif; ?>
                             </tr>
 
                         <?php endforeach; ?>

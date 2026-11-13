@@ -13,6 +13,9 @@ function escaparDocente(mixed $valor): string
 /** Listado de docentes activos, obtenido exclusivamente mediante API HTTP. */
 function mostrarListaDocentes(array $errores = []): void
 {
+    // Los permisos visuales complementan la autorización del backend.
+    $rolesVista = $_SESSION['usuario']['roles'] ?? [];
+    $esAdminVista = is_array($rolesVista) && in_array('admin', $rolesVista, true);
     $respuesta = listarDocentes();
     $docentes = [];
     if ($respuesta['correcta']) {
@@ -47,9 +50,11 @@ function mostrarListaDocentes(array $errores = []): void
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
         <div>
             <h1 class="h2 mb-1">Docentes</h1>
-            <p class="text-muted mb-0">Administre los docentes y sus líneas de investigación principales.</p>
+            <p class="text-muted mb-0"><?= $esAdminVista ? 'Administre los docentes y sus líneas de investigación principales.' : 'Consulte los registros del módulo.' ?></p>
         </div>
+        <?php if ($esAdminVista): ?>
         <a href="/docentes/nuevo" class="btn btn-primary">Registrar docente</a>
+        <?php endif; ?>
     </div>
 
     <?php if ($mensaje !== ''): ?>
@@ -75,7 +80,9 @@ function mostrarListaDocentes(array $errores = []): void
                     <th scope="col">Correo</th>
                     <th scope="col">Cargo</th>
                     <th scope="col">Línea principal</th>
+                    <?php if ($esAdminVista): ?>
                     <th scope="col">Acciones</th>
+                    <?php endif; ?>
                 </tr></thead>
                 <tbody>
                 <?php foreach ($docentes as $docente): ?>
@@ -93,6 +100,7 @@ function mostrarListaDocentes(array $errores = []): void
                         <td><?= escaparDocente($docente['correo'] ?? '') ?></td>
                         <td><?= escaparDocente($docente['cargo'] ?? '') ?></td>
                         <td><?= escaparDocente($lineaTexto) ?></td>
+                        <?php if ($esAdminVista): ?>
                         <td>
                             <div class="d-flex flex-wrap gap-2">
                                 <a class="btn btn-outline-primary btn-sm"
@@ -104,6 +112,7 @@ function mostrarListaDocentes(array $errores = []): void
                                 </form>
                             </div>
                         </td>
+                        <?php endif; ?>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>

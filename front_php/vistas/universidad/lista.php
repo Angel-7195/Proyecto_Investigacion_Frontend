@@ -11,6 +11,9 @@ require_once __DIR__ . '/../../cliente_api.php';
  */
 function mostrarListaUniversidades(): void
 {
+    // Los permisos visuales complementan la autorización del backend.
+    $rolesVista = $_SESSION['usuario']['roles'] ?? [];
+    $esAdminVista = is_array($rolesVista) && in_array('admin', $rolesVista, true);
     $respuesta = listarUniversidades();
 
     ob_start();
@@ -23,17 +26,17 @@ function mostrarListaUniversidades(): void
                 Universidades
             </h1>
 
-            <p class="text-muted mb-0">
-                Consulte y administre las universidades registradas.
-            </p>
+            <p class="text-muted mb-0"><?= $esAdminVista ? 'Consulte y administre las universidades registradas.' : 'Consulte los registros del módulo.' ?></p>
         </div>
 
+        <?php if ($esAdminVista): ?>
         <a
             href="/universidades/nuevo"
             class="btn btn-primary"
         >
             Registrar universidad
         </a>
+        <?php endif; ?>
 
     </div>
 
@@ -51,12 +54,14 @@ function mostrarListaUniversidades(): void
             Todavía no hay universidades registradas.
         </div>
 
+        <?php if ($esAdminVista): ?>
         <a
             href="/universidades/nuevo"
             class="btn btn-primary"
         >
             Registrar primera universidad
         </a>
+        <?php endif; ?>
 
     <?php elseif (!$respuesta['correcta']): ?>
 
@@ -89,7 +94,9 @@ function mostrarListaUniversidades(): void
                             <th>Nombre</th>
                             <th>Tipo</th>
                             <th>Ciudad</th>
+                            <?php if ($esAdminVista): ?>
                             <th class="text-end">Acciones</th>
+                            <?php endif; ?>
                         </tr>
 
                     </thead>
@@ -139,6 +146,7 @@ function mostrarListaUniversidades(): void
                                     ) ?>
                                 </td>
 
+                                <?php if ($esAdminVista): ?>
                                 <td class="text-end">
 
                                     <a
@@ -175,6 +183,7 @@ function mostrarListaUniversidades(): void
                                     </form>
 
                                 </td>
+                                <?php endif; ?>
 
                             </tr>
 

@@ -50,14 +50,27 @@ function llamarApi(
         ];
     }
 
+    // Las rutas protegidas recibirán el JWT de la sesión PHP.
+    // El login es público y no necesita enviar un token anterior.
+    $cabeceras = [
+        'Content-Type: application/json; charset=utf-8',
+        'Accept: application/json',
+    ];
+
+    if ($recurso !== 'login' && session_status() === PHP_SESSION_ACTIVE) {
+        $jwt = $_SESSION['jwt'] ?? null;
+        if (is_string($jwt) && $jwt !== '' && !preg_match('/[\r\n]/', $jwt)) {
+            $cabeceras[] = 'Authorization: Bearer ' . $jwt;
+        }
+    }
+
     $opciones = [
-        'http' => [
-            'method' => strtoupper($metodo),
-            'header' => "Content-Type: application/json; charset=utf-8\r\n"
-                . "Accept: application/json\r\n",
-            'ignore_errors' => true,
-            'timeout' => 10,
-        ],
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CUSTOMREQUEST => strtoupper($metodo),
+        CURLOPT_HTTPHEADER => $cabeceras,
+        CURLOPT_CONNECTTIMEOUT => 5,
+        CURLOPT_TIMEOUT => 10,
+        CURLOPT_FOLLOWLOCATION => false,
     ];
 
     if ($datos !== null) {
@@ -77,20 +90,30 @@ function llamarApi(
             ];
         }
 
-        $opciones['http']['content'] = $json;
+        $opciones[CURLOPT_POSTFIELDS] = $json;
     }
 
-    $contexto = stream_context_create($opciones);
-
-    // La variable se establece al ejecutar la petición HTTP.
-    $respuesta = @file_get_contents($url, false, $contexto);
-    $codigo = 0;
-
-    foreach ($http_response_header ?? [] as $cabecera) {
-        if (preg_match('/^HTTP\/\S+\s+(\d{3})\b/', $cabecera, $coincidencia)) {
-            $codigo = (int) $coincidencia[1];
-        }
+    $conexion = curl_init($url);
+    if ($conexion === false) {
+        return [
+            'codigo' => 0,
+            'datos' => [],
+            'error' => 'No se pudo inicializar la conexión con la API.',
+        ];
     }
+
+    if (!curl_setopt_array($conexion, $opciones)) {
+        curl_close($conexion);
+        return [
+            'codigo' => 0,
+            'datos' => [],
+            'error' => 'No se pudo configurar la petición a la API.',
+        ];
+    }
+
+    $respuesta = curl_exec($conexion);
+    $codigo = (int) curl_getinfo($conexion, CURLINFO_RESPONSE_CODE);
+    curl_close($conexion);
 
     if ($respuesta === false) {
         return [
@@ -144,6 +167,20 @@ function adaptarRespuestaApi(array $respuesta): array
         'datos' => $respuesta['datos'] ?? [],
         'error' => $error,
     ];
+}
+
+// ----------------------------------------------------------------------
+// AUTENTICACION - V3
+// ----------------------------------------------------------------------
+
+function iniciarSesionApi(string $username, string $password): array
+{
+    return adaptarRespuestaApi(
+        llamarApi('POST', 'login', '', [
+            'username' => $username,
+            'password' => $password,
+        ])
+    );
 }
 
 // ----------------------------------------------------------------------
@@ -564,4 +601,84 @@ function crearAsociacionSemilleroLinea(array $datos): array
 function retirarAsociacionSemilleroLinea(int $semilleroId, int $lineaId): array
 {
     return adaptarRespuestaApi(llamarApi('DELETE', 'semillero_linea', [(string) $semilleroId, (string) $lineaId]));
+}
+
+// ----------------------------------------------------------------------
+// USUARIOS — V3 (SOLO ADMIN)
+// ----------------------------------------------------------------------
+
+function listarUsuarios(): array
+{
+    return adaptarRespuestaApi(
+        llamarApi('GET', 'usuario')
+    );
+}
+
+function crearUsuario(array $datos): array
+{
+    return adaptarRespuestaApi(
+        llamarApi('POST', 'usuario', '', $datos)
+    );
+}
+
+// ----------------------------------------------------------------------
+// USUARIOS — V3
+// ----------------------------------------------------------------------
+
+// Consultar un usuario por su ID.
+function obtenerUsuario(int $id): array
+{
+    return adaptarRespuestaApi(
+        llamarApi('GET', 'usuario', (string) $id)
+    );
+}
+
+// Actualizar todos los datos del perfil de un usuario.
+function reemplazarUsuario(int $id, array $datos): array
+{
+    return adaptarRespuestaApi(
+        llamarApi('PUT', 'usuario', (string) $id, $datos)
+    );
+}
+
+// Actualizar únicamente los campos modificados del usuario.
+function actualizarUsuarioParcial(int $id, array $datos): array
+{
+    return adaptarRespuestaApi(
+        llamarApi('PATCH', 'usuario', (string) $id, $datos)
+    );
+}
+
+// ----------------------------------------------------------------------
+// ASIGNACIONES ROL_USUARIO — V3 (SOLO ADMIN)
+// ----------------------------------------------------------------------
+
+function listarRolesUsuario(): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'rol_usuario'));
+}
+
+function obtenerRolUsuario(int $usuarioId, int $rolId): array
+{
+    // Es una clave compuesta: pasar los segmentos como array evita codificar la barra.
+    return adaptarRespuestaApi(
+        llamarApi('GET', 'rol_usuario', [(string) $usuarioId, (string) $rolId])
+    );
+}
+
+function asignarRolUsuario(int $usuarioId, int $rolId): array
+{
+    return adaptarRespuestaApi(
+        llamarApi('POST', 'rol_usuario', '', [
+            'usuario_id' => $usuarioId,
+            'rol_id' => $rolId,
+        ])
+    );
+}
+
+function retirarRolUsuario(int $usuarioId, int $rolId): array
+{
+    return adaptarRespuestaApi(
+        llamarApi('DELETE', 'rol_usuario', [(string) $usuarioId, (string) $rolId])
+    );
 }

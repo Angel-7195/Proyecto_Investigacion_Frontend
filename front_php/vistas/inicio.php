@@ -7,6 +7,8 @@ require_once __DIR__ . '/compartidas/plantilla.php';
 /** Panel de las entidades de V1 y las entidades de V2 disponibles. */
 function mostrarInicio(): void
 {
+    $rolesVista = $_SESSION['usuario']['roles'] ?? [];
+    $esAdminVista = is_array($rolesVista) && in_array('admin', $rolesVista, true);
     $recursos = [
         ['titulo' => 'Áreas de conocimiento', 'ruta' => '/areas-conocimiento',
          'descripcion' => 'Consulte y administre las grandes áreas, áreas y disciplinas.'],
@@ -48,7 +50,7 @@ function mostrarInicio(): void
         <div class="p-4 mb-4 bg-white border rounded-3 shadow-sm panel-portada">
             <h1 class="display-6 fw-bold">Panel de investigación</h1>
             <p class="mb-0 text-muted">
-                Seleccione un recurso para consultar o administrar sus registros.
+                <?= $esAdminVista ? 'Seleccione un recurso para consultar o administrar sus registros.' : 'Seleccione un recurso para consultar sus registros.' ?>
             </p>
         </div>
         <div class="row g-3">
@@ -60,11 +62,11 @@ function mostrarInicio(): void
                                 <?= htmlspecialchars($recurso['titulo'], ENT_QUOTES, 'UTF-8') ?>
                             </h2>
                             <p class="card-text text-muted flex-grow-1">
-                                <?= htmlspecialchars($recurso['descripcion'], ENT_QUOTES, 'UTF-8') ?>
+                                <?= $esAdminVista ? htmlspecialchars($recurso['descripcion'], ENT_QUOTES, 'UTF-8') : 'Consulte la información disponible de este módulo.' ?>
                             </p>
                             <a class="btn btn-primary align-self-start"
                                href="<?= htmlspecialchars($recurso['ruta'], ENT_QUOTES, 'UTF-8') ?>">
-                                Gestionar
+                                <?= $esAdminVista ? 'Gestionar' : 'Consultar' ?>
                             </a>
                         </div>
                     </div>
