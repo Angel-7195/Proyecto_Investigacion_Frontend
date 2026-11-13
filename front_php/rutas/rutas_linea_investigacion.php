@@ -10,6 +10,42 @@ declare(strict_types=1);
 require_once __DIR__ . '/../vistas/linea_investigacion/lista.php';
 require_once __DIR__ . '/../vistas/linea_investigacion/formulario.php';
 
+// ----------------------------------------------------------------------
+// AUTORIZACION DE FORMULARIOS - V3
+// ----------------------------------------------------------------------
+
+$rolesLineas = $_SESSION['usuario']['roles'] ?? [];
+
+$esAdminLineas = is_array($rolesLineas)
+    && in_array('admin', $rolesLineas, true);
+
+// Los formularios GET de creacion y edicion requieren el rol admin.
+// Los POST de modificacion ya se protegen globalmente en index.php.
+if (
+    $metodo === 'GET'
+    && in_array(
+        $ruta,
+        ['/lineas-investigacion/nuevo', '/lineas-investigacion/editar'],
+        true
+    )
+    && !$esAdminLineas
+) {
+    http_response_code(403);
+
+    renderizarPlantilla(
+        'Acceso denegado',
+        '<div class="alert alert-warning" role="alert">
+            <h1 class="h4">Acceso denegado</h1>
+            <p>No tienes permisos para crear o editar líneas de investigación.</p>
+            <a href="/lineas-investigacion" class="btn btn-outline-dark">
+                Volver al listado
+            </a>
+        </div>'
+    );
+
+    exit;
+}
+
 // ======================================================================
 // LINEAS DE INVESTIGACION
 // ======================================================================

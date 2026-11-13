@@ -69,6 +69,12 @@ function erroresApiCrudRestante(array $respuesta): array
 function mostrarListaCatalogoCompartida(string $recurso, array $errores = []): void
 {
     $config = configuracionCrudRestantes()[$recurso];
+
+    // V3: las opciones de modificación son exclusivas del administrador.
+    // La autorización efectiva se comprueba también en las rutas y en la API.
+    $roles = $_SESSION['usuario']['roles'] ?? [];
+    $esAdmin = is_array($roles) && in_array('admin', $roles, true);
+
     $respuesta = llamarApi('GET', $recurso);
     $codigo = (int) ($respuesta['codigo'] ?? 0);
     $registros = $respuesta['datos']['datos'] ?? [];
@@ -82,11 +88,17 @@ function mostrarListaCatalogoCompartida(string $recurso, array $errores = []): v
     <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap mb-4">
         <div>
             <h1 class="h2"><?= escaparCrudRestante($config['titulo']) ?></h1>
-            <p class="text-muted">Consulte y administre los registros del módulo.</p>
+            <p class="text-muted">
+                <?= $esAdmin
+                    ? 'Consulte y administre los registros del módulo.'
+                    : 'Consulte los registros del módulo.' ?>
+            </p>
         </div>
-        <a class="btn btn-primary" href="<?= escaparCrudRestante($config['ruta']) ?>/nuevo">
-            Registrar <?= escaparCrudRestante($config['singular']) ?>
-        </a>
+        <?php if ($esAdmin): ?>
+            <a class="btn btn-primary" href="<?= escaparCrudRestante($config['ruta']) ?>/nuevo">
+                Registrar <?= escaparCrudRestante($config['singular']) ?>
+            </a>
+        <?php endif; ?>
     </div>
     <?php if ($mensaje !== ''): ?>
         <div class="alert alert-success"><?= escaparCrudRestante($mensaje) ?></div>
@@ -116,7 +128,9 @@ function mostrarListaCatalogoCompartida(string $recurso, array $errores = []): v
                     <?php foreach ($config['campos'] as $campo): ?>
                         <th><?= escaparCrudRestante($campo['etiqueta']) ?></th>
                     <?php endforeach; ?>
-                    <th class="text-end">Acciones</th>
+                    <?php if ($esAdmin): ?>
+                        <th class="text-end">Acciones</th>
+                    <?php endif; ?>
                 </tr></thead>
                 <tbody>
                 <?php foreach ($registros as $registro): ?>
@@ -130,18 +144,20 @@ function mostrarListaCatalogoCompartida(string $recurso, array $errores = []): v
                         <?php foreach ($config['campos'] as $nombre => $campo): ?>
                             <td><?= escaparCrudRestante($registro[$nombre] ?? '') ?></td>
                         <?php endforeach; ?>
-                        <td class="text-end text-nowrap">
-                            <a class="btn btn-sm btn-outline-primary"
-                               href="<?= escaparCrudRestante($config['ruta']) ?>/editar?id=<?= rawurlencode($id) ?>">
-                               Editar
-                            </a>
-                            <form class="d-inline" method="POST"
-                                  action="<?= escaparCrudRestante($config['ruta']) ?>/retirar"
-                                  onsubmit="return confirm('¿Desea retirar este registro?');">
-                                <input type="hidden" name="id" value="<?= escaparCrudRestante($id) ?>">
-                                <button class="btn btn-sm btn-outline-danger" type="submit">Retirar</button>
-                            </form>
-                        </td>
+                        <?php if ($esAdmin): ?>
+                            <td class="text-end text-nowrap">
+                                <a class="btn btn-sm btn-outline-primary"
+                                   href="<?= escaparCrudRestante($config['ruta']) ?>/editar?id=<?= rawurlencode($id) ?>">
+                                   Editar
+                                </a>
+                                <form class="d-inline" method="POST"
+                                      action="<?= escaparCrudRestante($config['ruta']) ?>/retirar"
+                                      onsubmit="return confirm('¿Desea retirar este registro?');">
+                                    <input type="hidden" name="id" value="<?= escaparCrudRestante($id) ?>">
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">Retirar</button>
+                                </form>
+                            </td>
+                        <?php endif; ?>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>

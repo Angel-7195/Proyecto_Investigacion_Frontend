@@ -13,6 +13,9 @@ function escaparParticipaGrupo(mixed $valor): string
 /** Muestra participaciones activas y los nombres de docente/grupo si la API los ofrece. */
 function mostrarListaParticipacionesGrupo(array $errores = []): void
 {
+    // Los permisos visuales complementan la autorización del backend.
+    $rolesVista = $_SESSION['usuario']['roles'] ?? [];
+    $esAdminVista = is_array($rolesVista) && in_array('admin', $rolesVista, true);
     $respuesta = listarParticipacionesGrupo();
     $participaciones = [];
     if ($respuesta['correcta']) {
@@ -57,9 +60,11 @@ function mostrarListaParticipacionesGrupo(array $errores = []): void
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
         <div>
             <h1 class="h2 mb-1">Participaciones en grupos</h1>
-            <p class="text-muted mb-0">Administre la participación de docentes en grupos de investigación.</p>
+            <p class="text-muted mb-0"><?= $esAdminVista ? 'Administre la participación de docentes en grupos de investigación.' : 'Consulte los registros del módulo.' ?></p>
         </div>
+        <?php if ($esAdminVista): ?>
         <a href="/participaciones-grupo/nuevo" class="btn btn-primary">Registrar participación</a>
+        <?php endif; ?>
     </div>
 
     <?php if ($mensaje !== ''): ?>
@@ -84,7 +89,9 @@ function mostrarListaParticipacionesGrupo(array $errores = []): void
                     <th scope="col">Rol</th>
                     <th scope="col">Fecha de inicio</th>
                     <th scope="col">Fecha de finalización</th>
+                    <?php if ($esAdminVista): ?>
                     <th scope="col">Acciones</th>
+                    <?php endif; ?>
                 </tr></thead>
                 <tbody>
                 <?php foreach ($participaciones as $participacion): ?>
@@ -101,6 +108,7 @@ function mostrarListaParticipacionesGrupo(array $errores = []): void
                         <td><?= escaparParticipaGrupo($participacion['rol'] ?? '') ?></td>
                         <td><?= escaparParticipaGrupo($participacion['fecha_inicio'] ?? '') ?></td>
                         <td><?= escaparParticipaGrupo($participacion['fecha_fin'] ?? 'Sin fecha') ?></td>
+                        <?php if ($esAdminVista): ?>
                         <td>
                             <div class="d-flex flex-wrap gap-2">
                                 <a class="btn btn-outline-primary btn-sm"
@@ -113,6 +121,7 @@ function mostrarListaParticipacionesGrupo(array $errores = []): void
                                 </form>
                             </div>
                         </td>
+                        <?php endif; ?>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>

@@ -13,6 +13,9 @@ function escaparSemillero(mixed $valor): string
 /** Listado de semilleros activos consultados exclusivamente por HTTP. */
 function mostrarListaSemilleros(array $errores = []): void
 {
+    // Los permisos visuales complementan la autorización del backend.
+    $rolesVista = $_SESSION['usuario']['roles'] ?? [];
+    $esAdminVista = is_array($rolesVista) && in_array('admin', $rolesVista, true);
     $respuesta = listarSemilleros();
     $semilleros = [];
     if ($respuesta['correcta']) {
@@ -47,9 +50,11 @@ function mostrarListaSemilleros(array $errores = []): void
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
         <div>
             <h1 class="h2 mb-1">Semilleros</h1>
-            <p class="text-muted mb-0">Administre los semilleros y sus grupos de investigación.</p>
+            <p class="text-muted mb-0"><?= $esAdminVista ? 'Administre los semilleros y sus grupos de investigación.' : 'Consulte los registros del módulo.' ?></p>
         </div>
+        <?php if ($esAdminVista): ?>
         <a href="/semilleros/nuevo" class="btn btn-primary">Registrar semillero</a>
+        <?php endif; ?>
     </div>
 
     <?php if ($mensaje !== ''): ?>
@@ -76,7 +81,9 @@ function mostrarListaSemilleros(array $errores = []): void
                         <th scope="col">Nombre</th>
                         <th scope="col">Fecha de fundación</th>
                         <th scope="col">Grupo de investigación</th>
+                        <?php if ($esAdminVista): ?>
                         <th scope="col">Acciones</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
@@ -92,6 +99,7 @@ function mostrarListaSemilleros(array $errores = []): void
                             <td><?= escaparSemillero($semillero['nombre'] ?? '') ?></td>
                             <td><?= escaparSemillero($semillero['fecha_fundacion'] ?? '') ?></td>
                             <td><?= escaparSemillero($nombreGrupo) ?> (ID <?= escaparSemillero($idGrupo) ?>)</td>
+                            <?php if ($esAdminVista): ?>
                             <td>
                                 <div class="d-flex flex-wrap gap-2">
                                     <a class="btn btn-outline-primary btn-sm"
@@ -103,6 +111,7 @@ function mostrarListaSemilleros(array $errores = []): void
                                     </form>
                                 </div>
                             </td>
+                            <?php endif; ?>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

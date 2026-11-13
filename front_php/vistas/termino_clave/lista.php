@@ -11,6 +11,9 @@ require_once __DIR__ . '/../../cliente_api.php';
  */
 function mostrarListaTerminosClave(): void
 {
+    // Los permisos visuales complementan la autorización del backend.
+    $rolesVista = $_SESSION['usuario']['roles'] ?? [];
+    $esAdminVista = is_array($rolesVista) && in_array('admin', $rolesVista, true);
     $respuesta = listarTerminosClave();
 
     ob_start();
@@ -23,17 +26,17 @@ function mostrarListaTerminosClave(): void
                 Términos clave
             </h1>
 
-            <p class="text-muted mb-0">
-                Consulte y administre los términos clave registrados.
-            </p>
+            <p class="text-muted mb-0"><?= $esAdminVista ? 'Consulte y administre los términos clave registrados.' : 'Consulte los registros del módulo.' ?></p>
         </div>
 
+        <?php if ($esAdminVista): ?>
         <a
             href="/terminos-clave/nuevo"
             class="btn btn-primary"
         >
             Registrar término
         </a>
+        <?php endif; ?>
 
     </div>
 
@@ -51,12 +54,14 @@ function mostrarListaTerminosClave(): void
             Todavía no hay registros.
         </div>
 
+        <?php if ($esAdminVista): ?>
         <a
             href="/terminos-clave/nuevo"
             class="btn btn-primary"
         >
             Registrar primer término
         </a>
+        <?php endif; ?>
 
     <?php elseif (!$respuesta['correcta']): ?>
 
@@ -87,7 +92,9 @@ function mostrarListaTerminosClave(): void
                         <tr>
                             <th>Término</th>
                             <th>Término en inglés</th>
+                            <?php if ($esAdminVista): ?>
                             <th class="text-end">Acciones</th>
+                            <?php endif; ?>
                         </tr>
 
                     </thead>
@@ -129,6 +136,7 @@ function mostrarListaTerminosClave(): void
                                     <?php endif; ?>
                                 </td>
 
+                                <?php if ($esAdminVista): ?>
                                 <td class="text-end">
 
                                     <a
@@ -165,6 +173,7 @@ function mostrarListaTerminosClave(): void
                                     </form>
 
                                 </td>
+                                <?php endif; ?>
 
                             </tr>
 
