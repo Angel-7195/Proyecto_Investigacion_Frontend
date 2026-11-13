@@ -66,63 +66,34 @@ function renderizarPlantilla(string $titulo, string $contenido): void
                 <div class="collapse navbar-collapse" id="navegacionInvestigacion">
                     <div class="navbar-nav ms-auto flex-wrap">
                         <?php if ($sesionIniciada): ?>
-
                             <a class="nav-link" href="/">Inicio</a>
 
                             <?php if ($esAdmin || $esConsulta): ?>
-
                                 <?php foreach ($navegacion as [$ruta, $nombre]): ?>
-
-                                    <a class="nav-link"
-                                        href="<?= htmlspecialchars($ruta, ENT_QUOTES, 'UTF-8') ?>">
-
+                                    <a class="nav-link" href="<?= htmlspecialchars($ruta, ENT_QUOTES, 'UTF-8') ?>">
                                         <?= htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8') ?>
-
                                     </a>
-
                                 <?php endforeach; ?>
-
                             <?php endif; ?>
 
                             <?php if ($esAdmin): ?>
-
-                                <span class="navbar-text text-white ms-lg-3 small">
-                                    Administrador
-                                </span>
-
+                                <a class="nav-link" href="/usuarios">Usuarios</a>
+                                <a class="nav-link" href="/roles-usuarios">Roles por usuario</a>
+                                <span class="navbar-text text-white ms-lg-3 small">Administrador</span>
                             <?php elseif ($esConsulta): ?>
-
-                                <span class="navbar-text text-white ms-lg-3 small">
-                                    Consulta - Solo lectura
-                                </span>
-
+                                <span class="navbar-text text-white ms-lg-3 small">Consulta - Solo lectura</span>
                             <?php endif; ?>
 
-                        <?php endif; ?>
-                        <?php if ($sesionIniciada): ?>
-
                             <form method="post" action="/logout"
-                                class="d-flex align-items-center ms-lg-3 my-2 my-lg-0">
-
-                                <input type="hidden"
-                                    name="csrf_token"
-                                    value="<?= htmlspecialchars(
-                                                (string) $_SESSION['csrf_logout'],
-                                                ENT_QUOTES,
-                                                'UTF-8'
-                                            ) ?>">
-
+                                  class="d-flex align-items-center ms-lg-3 my-2 my-lg-0">
+                                <input type="hidden" name="csrf_token"
+                                       value="<?= htmlspecialchars((string) $_SESSION['csrf_logout'], ENT_QUOTES, 'UTF-8') ?>">
                                 <button type="submit" class="btn btn-outline-light btn-sm">
                                     Cerrar sesión
                                 </button>
                             </form>
-
                         <?php else: ?>
-
-                            <a class="nav-link" href="/login">
-                                Iniciar sesión
-                            </a>
-
+                            <a class="nav-link" href="/login">Iniciar sesión</a>
                         <?php endif; ?>
                     </div>
                 </div>

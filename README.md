@@ -1,516 +1,304 @@
-# Proyecto de Investigación — Versión 2
+# Proyecto de Investigación — Frontend PHP
+
+**Versión actual: V3 — Inicio de sesión, permisos y administración (en desarrollo)**
+
+## Repositorios:
+
+- Backend: https://github.com/Angel-7195/Proyecto_Investigacion_Backend.git
+- Frontend: https://github.com/Angel-7195/Proyecto_Investigacion_Frontend.git
+
+Proyecto académico del módulo de Investigación, desarrollado con **PHP puro 8.3**, **HTML**, **CSS**, **Bootstrap local** y **Docker**. Esta aplicación presenta las interfaces al usuario y consume mediante HTTP la API REST del proyecto.
 
 ## Integrantes
 
-- Ángel David Gutiérrez Ladino
-- Miguel Ángel Lotero Álvarez
+- **Ángel David Gutiérrez Ladino:** integración de autenticación y autorización, vistas de `usuario` y gestión de asignaciones `rol_usuario`.
+- **Miguel Ángel Lotero Álvarez:** desarrollo del módulo independiente de administración de `rol` y demás responsabilidades acordadas por el equipo.
 
-Proyecto académico desarrollado en **PHP puro**, **HTML**, **CSS**, **Bootstrap**
-y **Docker** para el módulo de Investigación.
+> **Estado al 13 de noviembre de 2026.** La interfaz de login, las restricciones por rol, la administración de usuarios y la asignación/retirada de roles ya cuentan con pruebas funcionales. **V3 aún no está cerrada:** falta integrar el CRUD del catálogo `rol` de Miguel, verificar escenarios de seguridad y regresión pendientes, revisar los cambios en equipo y completar PR/tag.
 
-La versión 2 amplía los seis recursos sin claves foráneas de la v1 con los diez
-recursos del módulo que poseen relaciones entre tablas.
+## 1. Evolución del frontend
 
-El sistema está dividido en dos aplicaciones independientes:
+| Versión | Alcance | Estado conocido |
+|---|---|---|
+| **V1** | Interfaces para seis recursos del módulo de Investigación sin claves foráneas. | Implementadas y comprobadas anteriormente. |
+| **V2** | Diez recursos adicionales con relaciones y claves compuestas; se conservan las seis interfaces de V1. | Integradas en el proyecto y disponibles para consulta; queda pendiente registrar una regresión integral de todos sus métodos con seguridad V3. |
+| **V3** | Login y logout, sesión PHP, JWT Bearer, menús por rol y pantallas administrativas de seguridad. | **En desarrollo avanzado:** `usuario` y `rol_usuario` probados; catálogo `rol` de Miguel pendiente de integración. |
+| **V4** | Consultas multitabla, dashboard, mejoras visuales y publicación. | Pendiente, fuera de este alcance. |
 
-- **Backend:** API REST desarrollada en PHP y conectada a MariaDB.
-- **Frontend:** aplicación PHP que consume la API mediante HTTP y presenta las
-  páginas HTML al usuario.
+Este repositorio contiene **solo el frontend**. La base de datos MariaDB y las reglas de negocio pertenecen al backend, que reside en **`Proyecto_Investigacion_Backend`**.
 
-Este repositorio corresponde exclusivamente al **frontend**.
+## 2. Arquitectura y responsabilidades
 
-El frontend no se conecta directamente a MariaDB y no contiene credenciales de
-la base de datos.
-
----
-
-## Estado de la versión
-
-La **v2 se encuentra en desarrollo**.
-
-Actualmente se cuenta con:
-
-- los seis CRUD de la v1 funcionando en el frontend;
-- las rutas y vistas organizadas en carpetas por entidad;
-- un Front Controller que dirige las solicitudes a los archivos de rutas;
-- Bootstrap local y una hoja de estilos CSS personalizada;
-- la comunicación HTTP con la API mediante `cliente_api.php`;
-- el CRUD de `grupo_investigacion` integrado y comprobado desde el navegador;
-- el formulario de grupos con selección de universidades activas.
-
-De las diez entidades nuevas de la v2, **una tiene su interfaz implementada**:
-`grupo_investigacion`. Las otras nueve están pendientes de desarrollo.
-
-La implementación se realiza progresivamente siguiendo el Spec Kit del
-repositorio backend. La incorporación de código a la rama principal se coordina
-mediante Pull Requests.
-
----
-
-## Cómo levantar el proyecto
-
-El archivo `docker-compose.yml` se encuentra en el repositorio backend.
-
-Por esta razón, para levantar el sistema completo se debe abrir una terminal
-desde la raíz del repositorio backend y ejecutar:
-
-```powershell
-docker compose up -d --build
+```text
+Navegador
+   ↓
+Frontend PHP — sesión y vistas
+   ↓ Solicitud HTTP + Authorization: Bearer <JWT>
+API de Investigación — autenticación y autorización
+   ↓ Controladores → Servicios → Repositorios PDO
+MariaDB
 ```
 
-Para comprobar que los contenedores están activos:
+La separación es intencional:
 
-```powershell
-docker compose ps
+- **Frontend:** navegación, formularios, validaciones de presentación, sesión PHP, mensajes y solicitudes HTTP a la API.
+- **Backend:** verifica credenciales, firma JWT, consulta roles activos, autoriza operaciones, valida reglas de negocio y accede a MariaDB.
+
+El frontend **no usa PDO, no consulta MariaDB ni debe almacenar credenciales de la base**. Ocultar botones según el rol mejora la interfaz, pero la seguridad real debe comprobarse siempre en la API.
+
+### Estructura principal
+
+```text
+Proyecto_Investigacion_Frontend/
+├── front_php/
+│   ├── index.php                           # Front Controller; login/logout y rutas
+│   ├── cliente_api.php                     # Comunicación HTTP; encabezado Bearer
+│   ├── Dockerfile
+│   ├── rutas/
+│   │   ├── compartidas/
+│   │   ├── rutas_area_conocimiento.php
+│   │   ├── ...                             # Otros 15 recursos V1/V2
+│   │   ├── rutas_usuario.php               # Gestión de usuarios V3
+│   │   └── rutas_rol_usuario.php           # Asignación/retiro de roles V3
+│   ├── vistas/
+│   │   ├── inicio.php
+│   │   ├── autenticacion/login.php
+│   │   ├── compartidas/plantilla.php
+│   │   ├── usuario/
+│   │   │   ├── lista.php
+│   │   │   └── formulario.php
+│   │   ├── rol_usuario/gestion.php
+│   │   └── ...                             # Vistas de los recursos V1/V2
+│   └── publico/
+│       ├── bootstrap.min.css
+│       ├── bootstrap.bundle.min.js
+│       └── css/estilos.css
+├── .gitignore
+└── README.md
 ```
 
-Para reconstruir solamente el frontend después de modificar sus archivos:
+`index.php` interpreta las rutas, inicia y protege la sesión, incluye los archivos de cada entidad y sirve los archivos estáticos existentes de `publico/`. `cliente_api.php` utiliza `URL_API` para llamar al backend y agrega el Bearer del JWT conservado en `$_SESSION` cuando corresponde.
+
+> **Decisión técnica por revisar con el equipo:** el cliente PHP usa `stream_context_create()` y `file_get_contents()` para HTTP. La documentación del curso menciona cURL; debe resolverse esa diferencia antes de afirmar cumplimiento completo de la metodología.
+
+## 3. Cómo ejecutar el proyecto
+
+El archivo `docker-compose.yml` se encuentra **en el repositorio backend**, no en este frontend. Para ejecutar la aplicación completa se requieren ambos repositorios en el computador.
+
+1. Clonar o disponer de `Proyecto_Investigacion_Backend` y `Proyecto_Investigacion_Frontend` en carpetas independientes.
+2. En el archivo `.env` del backend, configurar `FRONT_PATH` con la ruta real al frontend y completar las variables locales necesarias. La API debe tener un `JWT_SECRET` seguro. **Nunca publicar el `.env`.**
+3. Abrir PowerShell en la raíz del backend y ejecutar:
+
+   ```powershell
+   docker compose up -d --build
+   docker compose ps
+   ```
+
+Si se modificó solamente el frontend, se puede reconstruir su servicio desde la raíz del backend:
 
 ```powershell
 docker compose up -d --build front-php
 ```
 
-Para detener los contenedores sin borrar los datos persistentes:
+Para detener los contenedores sin eliminar la información de MariaDB:
 
 ```powershell
 docker compose down
 ```
 
-No es necesario eliminar el volumen de MariaDB para actualizar las páginas
-PHP del frontend.
+**No ejecutar `docker compose down -v` como parte del trabajo habitual:** ese comando también elimina volúmenes y puede borrar los datos locales.
 
-## Accesos locales
+### Accesos del entorno probado
 
-| Servicio | Dirección |
+| Servicio | Dirección habitual |
 |---|---|
-| Frontend | http://localhost:8110 |
+| Frontend (login) | http://localhost:8110/login |
+| Frontend (inicio tras autenticarse) | http://localhost:8110/ |
 | API | http://localhost:8111 |
 | phpMyAdmin | http://localhost:8105 |
-| MariaDB | `localhost:13330` |
+| MariaDB desde el equipo | `localhost:13330` |
 
-El endpoint raíz de la API permite comprobar que el backend está activo:
+Los puertos pueden variar con `docker-compose.yml`. Si es una instalación nueva, el **primer ADMIN** debe inicializarse mediante el script CLI del backend; crear esa cuenta no es una función pública del frontend.
 
-http://localhost:8111/
+## 4. Las 16 pantallas de Investigación — V1 y V2
 
-La página de inicio del frontend está disponible en:
+El frontend conserva rutas propias para los seis recursos de V1 y los diez recursos relacionados de V2.
 
-http://localhost:8110/
-
-## Qué incluye la v2
-
-La versión 2 mantiene las seis entidades de la v1 e incorpora las diez entidades
-con claves foráneas del módulo de Investigación.
-
-### Recursos conservados de la v1
-
-| Recurso | Llave primaria | Datos principales |
+| Versión | Ruta web de consulta | Recurso de la API |
 |---|---|---|
-| `area_conocimiento` | `id` | gran área, área y disciplina |
-| `objetivo_desarrollo_sostenible` | `id` | nombre y categoría |
-| `area_aplicacion` | `id` | nombre |
-| `termino_clave` | `termino` | término y término en inglés |
-| `universidad` | `id` | nombre, tipo y ciudad |
-| `linea_investigacion` | `id` autoincremental | nombre y descripción |
+| V1 | `/areas-conocimiento` | `area_conocimiento` |
+| V1 | `/objetivos-desarrollo-sostenible` | `objetivo_desarrollo_sostenible` |
+| V1 | `/areas-aplicacion` | `area_aplicacion` |
+| V1 | `/terminos-clave` | `termino_clave` |
+| V1 | `/universidades` | `universidad` |
+| V1 | `/lineas-investigacion` | `linea_investigacion` |
+| V2 | `/grupos-investigacion` | `grupo_investigacion` |
+| V2 | `/semilleros` | `semillero` |
+| V2 | `/docentes` | `docente` |
+| V2 | `/participaciones-grupo` | `participa_grupo` |
+| V2 | `/participaciones-semillero` | `participa_semillero` |
+| V2 | `/asociaciones-grupo-linea` | `grupo_linea` |
+| V2 | `/asociaciones-semillero-linea` | `semillero_linea` |
+| V2 | `/asociaciones-ac-linea` | `ac_linea` |
+| V2 | `/asociaciones-ods-linea` | `ods_linea` |
+| V2 | `/asociaciones-aa-linea` | `aa_linea` |
 
-### Recursos incorporados progresivamente en la v2
+Las tablas con claves compuestas conservan sus dos identificadores en las operaciones de detalle. Algunas asociaciones de V2 permiten **GET, POST y DELETE, pero no PUT/PATCH**; los métodos exactos dependen de los contratos de cada recurso.
 
-| Recurso | Relación principal | Estado en el frontend |
+**En V3 se agrega autenticación a estas pantallas:** `consulta` solo puede leer; `admin` puede acceder a las acciones de creación, edición y retiro que permita el contrato del recurso. El backend vuelve a verificar el rol antes de ejecutar cada operación.
+
+## 5. Autenticación y sesión — V3
+
+### Inicio de sesión
+
+| Ruta web | Método | Función |
 |---|---|---|
-| `grupo_investigacion` | universidad | Implementado |
-| `docente` | línea de investigación principal | Pendiente |
-| `semillero` | grupo de investigación | Pendiente |
-| `participa_semillero` | docente y semillero | Pendiente |
-| `participa_grupo` | docente y grupo de investigación | Pendiente |
-| `semillero_linea` | semillero y línea de investigación | Pendiente |
-| `grupo_linea` | grupo y línea de investigación | Pendiente |
-| `ac_linea` | línea y área de conocimiento | Pendiente |
-| `ods_linea` | línea y ODS | Pendiente |
-| `aa_linea` | área de aplicación y línea | Pendiente |
+| `/login` | GET | Mostrar el formulario de usuario y contraseña. |
+| `/login` | POST | Validar CSRF y enviar credenciales a `POST /api/login`. |
+| `/logout` | POST | Validar CSRF, limpiar JWT, destruir la sesión PHP y su cookie, y regresar a `/login`. |
 
-Las últimas siete entidades son tablas de asociación con **claves primarias
-compuestas**. Sus formularios y rutas se definirán al implementar cada recurso,
-de acuerdo con los contratos del backend.
+Cuando las credenciales son correctas:
 
-Las tablas `rol`, `usuario` y `rol_usuario` pertenecen al módulo de gestión de
-usuarios previsto para la v3; no forman parte de los diez CRUD de la v2.
+1. La API verifica la cuenta y su contraseña y devuelve un JWT HS256 vigente durante **60 minutos**.
+2. El frontend regenera el identificador de sesión y guarda el JWT, los datos mínimos del usuario y sus roles en `$_SESSION`.
+3. `cliente_api.php` envía el token mediante `Authorization: Bearer` en las peticiones protegidas.
+4. La navegación y las acciones visibles se adaptan al rol.
 
-## Estructura principal del frontend
+El frontend protege las cookies con `HttpOnly` y `SameSite=Lax`, y utiliza `Secure` cuando la conexión es HTTPS. Estas medidas constan en el código; queda pendiente una revisión dinámica completa de cookie y cierre de sesión.
 
-```text
-front_php/
-├── index.php
-├── Dockerfile
-├── cliente_api.php
-├── rutas/
-│   ├── compartidas/
-│   │   └── acciones_catalogo.php
-│   ├── rutas_area_conocimiento.php
-│   ├── rutas_objetivo_desarrollo_sostenible.php
-│   ├── rutas_area_aplicacion.php
-│   ├── rutas_termino_clave.php
-│   ├── rutas_universidad.php
-│   ├── rutas_linea_investigacion.php
-│   └── rutas_grupo_investigacion.php
-├── vistas/
-│   ├── inicio.php
-│   ├── compartidas/
-│   │   ├── plantilla.php
-│   │   ├── no_encontrada.php
-│   │   └── crud_catalogos.php
-│   ├── area_conocimiento/
-│   ├── objetivo_desarrollo_sostenible/
-│   ├── area_aplicacion/
-│   ├── termino_clave/
-│   ├── universidad/
-│   ├── linea_investigacion/
-│   └── grupo_investigacion/
-│       ├── lista.php
-│       └── formulario.php
-└── publico/
-    ├── bootstrap.min.css
-    ├── bootstrap.bundle.min.js
-    └── css/
-        └── estilos.css
+**Importante:** cerrar sesión elimina el token guardado por el frontend, pero **no revoca por sí solo** una copia de JWT emitida anteriormente. En cambio, si el backend detecta que el usuario perdió su rol o está inactivo, deniega nuevas peticiones protegidas aunque el token siga dentro de su plazo de vigencia.
 
-.gitignore
-README.md
-```
+### Permisos de navegación
 
-### front_php/index.php
+| Rol | Navegación y acciones permitidas |
+|---|---|
+| `admin` | Lecturas y acciones autorizadas de V1/V2; gestión administrativa de usuarios y asignaciones. |
+| `consulta` | Lectura de los 16 recursos de Investigación, sin crear, modificar, retirar ni administrar usuarios/roles. |
+| Cuenta sin rol activo | No puede iniciar una nueva sesión autenticada. |
 
-Es el **Front Controller** del frontend.
+**Las rutas directas también están protegidas.** Escribir manualmente `/usuarios` o `/roles-usuarios` siendo `consulta` produce una pantalla de acceso denegado; además, la API mantiene la autorización independiente.
 
-Todas las peticiones de navegación entran por este archivo. Su responsabilidad
-es interpretar la ruta solicitada y cargar el archivo de rutas correspondiente.
+## 6. Administración de usuarios — V3
 
-También se encarga de:
+La gestión de `usuario` es **exclusiva de `admin`**. Los formularios HTML envían `POST` al frontend; `cliente_api.php` utiliza el método HTTP específico de la API para la operación solicitada.
 
-- mostrar la página de inicio;
-- servir correctamente los archivos estáticos del directorio `publico/`;
-- cargar el cliente HTTP y las vistas compartidas;
-- mostrar una página 404 cuando no existe una ruta.
-
-No contiene SQL ni reglas de negocio de la base de datos.
-
-### front_php/rutas/
-
-Contiene los archivos que atienden las solicitudes de cada entidad.
-
-Cada archivo de rutas puede:
-
-- mostrar un listado o un formulario;
-- recibir los datos enviados mediante formularios HTML;
-- preparar esos datos antes de enviarlos a la API;
-- ejecutar las operaciones del cliente HTTP;
-- mostrar mensajes de validación y de error;
-- redirigir después de guardar o retirar un registro.
-
-El archivo `rutas/compartidas/acciones_catalogo.php` permite reutilizar acciones
-de los catálogos de V1 sin concentrar todas las rutas en `index.php`.
-
-La entidad `grupo_investigacion` tiene su archivo propio:
-
-```text
-front_php/rutas/rutas_grupo_investigacion.php
-```
-
-### front_php/cliente_api.php
-
-Es el archivo responsable de la comunicación HTTP con la API REST.
-
-Este archivo se encarga de:
-
-- consultar registros;
-- obtener un registro específico;
-- crear registros;
-- reemplazar registros mediante PUT;
-- actualizar parcialmente registros mediante PATCH;
-- retirar registros mediante DELETE;
-- interpretar los códigos HTTP y las respuestas JSON.
-
-La comunicación utiliza solicitudes HTTP desde PHP. El frontend trabaja con
-los contratos publicados por la API y no utiliza los modelos o repositorios
-internos del backend.
-
-### front_php/vistas/
-
-Contiene las páginas HTML que se muestran al usuario, organizadas por entidad.
-
-Las vistas incluyen:
-
-- la pantalla de inicio;
-- los listados de registros;
-- los formularios de creación y edición;
-- los mensajes de éxito y de error;
-- la pantalla de página no encontrada.
-
-La carpeta `vistas/compartidas/` contiene la plantilla general de la página y
-las vistas reutilizables.
-
-Para `grupo_investigacion` se utilizan:
-
-```text
-front_php/vistas/grupo_investigacion/lista.php
-front_php/vistas/grupo_investigacion/formulario.php
-```
-
-### front_php/publico/
-
-Contiene los archivos estáticos de la aplicación:
-
-- Bootstrap CSS almacenado localmente;
-- Bootstrap JavaScript almacenado localmente;
-- la hoja de estilos `css/estilos.css`.
-
-El CSS personalizado se carga después de Bootstrap para complementar sus
-estilos. Los archivos públicos se entregan directamente sin tratarlos como
-rutas de navegación.
-
-### front_php/Dockerfile
-
-Define la imagen utilizada para ejecutar el frontend en PHP.
-
-El servidor del frontend escucha dentro del contenedor en el puerto **8110**.
-
-## Pantallas de la v2
-
-Cada recurso dispone de una ruta propia en el frontend. No se utiliza una
-pantalla genérica que reciba el nombre de una tabla como parámetro.
-
-Las direcciones actuales de las siete entidades implementadas son:
-
-```text
-/areas-conocimiento
-/objetivos-desarrollo-sostenible
-/areas-aplicacion
-/terminos-clave
-/universidades
-/lineas-investigacion
-/grupos-investigacion
-```
-
-### Pantallas de Grupo de Investigación
-
-| Método | Ruta | Acción |
+| Ruta web | Método web | Operación |
 |---|---|---|
-| GET | `/grupos-investigacion` | Mostrar el listado de grupos activos |
-| GET | `/grupos-investigacion/nuevo` | Mostrar el formulario de creación |
-| GET | `/grupos-investigacion/editar?id=123` | Mostrar el formulario de edición |
-| POST | `/grupos-investigacion/crear` | Solicitar la creación de un grupo |
-| POST | `/grupos-investigacion/actualizar` | Solicitar actualización completa o parcial |
-| POST | `/grupos-investigacion/retirar` | Solicitar el retiro lógico |
+| `/usuarios` | GET | Listado de cuentas activas. |
+| `/usuarios/nuevo` | GET | Formulario de registro. |
+| `/usuarios/crear` | POST | `POST /api/usuario`. |
+| `/usuarios/editar?id=N` | GET | Ficha y formulario de edición. |
+| `/usuarios/actualizar` con `accion=completo` | POST | `PUT /api/usuario/N` para reemplazar perfil. |
+| `/usuarios/actualizar` con `accion=parcial` | POST | `PATCH /api/usuario/N` con los campos modificados. |
+| `/usuarios/editar?id=N&seccion=password` | GET | Formulario independiente de contraseña. |
+| `/usuarios/actualizar` con `accion=password` | POST | `PATCH /api/usuario/N/password`. |
+| `/usuarios/editar?id=N&seccion=eliminar` | GET | Confirmación para desactivar la cuenta. |
+| `/usuarios/actualizar` con `accion=eliminar` | POST | `DELETE /api/usuario/N` (borrado lógico). |
 
-Los formularios HTML envían solicitudes POST al frontend. Después, el frontend
-utiliza el método HTTP que corresponde para comunicarse con la API REST.
+### Validaciones principales
 
-Las otras nueve entidades de V2 tendrán rutas propias cuando se implementen.
+- Registro con `username`, correo válido, nombre completo opcional y contraseña con confirmación.
+- Contraseñas de **12 a 72 bytes**, sin mostrarlas nuevamente después de un error.
+- Edición del perfil separada del cambio de contraseña.
+- `PATCH` envía únicamente los campos realmente modificados; si no hay cambios, se informa al usuario.
+- Tokens CSRF para las operaciones de formularios administrativos.
+- Mensajes comprensibles para duplicados (`409`), datos inválidos (`422`) y falta de autorización (`401`/`403`).
+- Confirmación antes de desactivar un usuario. El backend conserva su fila con **`activo=0`** y el listado activo deja de mostrarla.
+- El último administrador activo debe permanecer protegido por las reglas del backend.
 
-## Relaciones y claves foráneas
+**Registrar un usuario no le asigna un rol automáticamente.** Para que pueda iniciar sesión, ADMIN debe asignarle un rol desde el módulo `rol_usuario`.
 
-La principal novedad de V2 es que algunos registros dependen de otros.
+## 7. Administración de roles por usuario — V3
 
-En `grupo_investigacion`, el campo `universidsad` referencia a
-`universidad.id`. En el formulario:
+`rol_usuario` gestiona la relación entre una cuenta y un rol; **no crea ni modifica tipos de rol**.
 
-- las universidades se consultan a través de la API;
-- el usuario puede seleccionar una universidad activa;
-- existe la opción **Sin universidad**, porque la relación es opcional;
-- el formulario prepara el identificador como entero o `null` antes de enviarlo
-  a la API.
+| Ruta web | Método web | Operación |
+|---|---|---|
+| `/roles-usuarios` | GET | Consultar asignaciones y mostrar formulario. |
+| `/roles-usuarios/asignar` | POST | `POST /api/rol_usuario` para crear un vínculo. |
+| `/roles-usuarios/confirmar-retiro?usuario_id=N&rol_id=R` | GET | Consultar y confirmar una asociación existente. |
+| `/roles-usuarios/retirar` | POST | `DELETE /api/rol_usuario/N/R` para retirar solo el vínculo. |
 
-El nombre `universidsad` se conserva tal como aparece en el esquema SQL y en
-los contratos actuales del backend. No se cambia únicamente desde el frontend.
+El módulo implementa:
 
-El frontend puede ayudar con las validaciones de los campos, pero corresponde
-al backend comprobar la existencia de las claves foráneas y aplicar las reglas
-de integridad referencial.
+- Selección de usuario activo y rol.
+- Prevención de duplicados (el backend devuelve `409`).
+- Confirmación explícita adicional antes de asignar privilegios `admin`.
+- Pantalla de confirmación para retirar roles, con protección CSRF asociada a la pareja usuario–rol.
+- Aviso «Último admin protegido» si solo queda una asignación administrativa activa; el backend también debe rechazar el retiro prohibido.
+- Comprobación de permisos vigentes en la API incluso si un usuario mantiene una sesión anterior abierta.
 
-## Comunicación con la API
+**Diferencia con el borrado lógico de usuarios:** retirar `rol_usuario` elimina **físicamente la asociación**, porque la tabla puente no tiene columna `activo`; no elimina físicamente el usuario ni el registro del catálogo `rol`.
 
-El frontend se comunica con el backend únicamente mediante HTTP.
+### Integración pendiente del catálogo `rol`
 
-El flujo normal de información es:
+La creación, edición y baja de los tipos de rol corresponde al módulo `rol` de **Miguel**. En la instancia local probada, `admin` tenía ID 1 y `consulta` ID 2; el selector actual usa **temporalmente esos dos IDs confirmados**. Al integrar el CRUD de Miguel deberá consumir el catálogo real, sin suponer que los IDs son iguales en todas las bases.
 
-```text
-Navegador
-    ↓
-Frontend PHP
-    ↓ HTTP y JSON
-API de Investigación
-    ↓
-MariaDB
-```
+## 8. Pruebas funcionales y de seguridad realizadas
 
-El frontend nunca utiliza este flujo:
+Las siguientes evidencias fueron aportadas por Ángel mediante terminal, navegador y consultas **de solo lectura** en phpMyAdmin:
 
-```text
-Frontend PHP
-    ↓
-MariaDB
-```
+| Prueba | Resultado observado |
+|---|---|
+| Levantar Docker y validar sintaxis | `docker compose up -d --build` correcto; PHP `-l` sin errores en archivos principales y del módulo de roles comprobados. |
+| ADMIN | Login correcto y acceso a las pantallas de administración. |
+| Alta de usuarios | Se registraron cuentas de prueba como Mario, Mariana y `prueba_delete_v3`. |
+| Edición y contraseña | Se actualizaron datos de perfil y contraseña; el acceso de prueba funcionó al asignar el rol requerido. |
+| Borrado lógico | `prueba_delete_v3` desapareció de activos y MariaDB conservó el registro con `activo=0`. |
+| Asignación de `consulta` | Mariana recibió el rol desde el frontend y pudo iniciar sesión. |
+| Rol duplicado | Se mostró un mensaje de asignación ya existente. |
+| Acceso de `consulta` | Lectura de **218 áreas de conocimiento**, sin botones CRUD; ruta administrativa directa denegada. |
+| Retiro de rol | La relación dejó de aparecer y SQL devolvió cero filas durante el retiro. |
+| Cuenta sin rol | No pudo iniciar una sesión nueva. |
+| Revocación durante sesión abierta | Al retirar su único rol, Mariana dejó de poder consultar el recurso protegido aunque la ventana seguía abierta. |
+| Recuperación de acceso | ADMIN devolvió el rol; después de iniciar sesión otra vez, Mariana recuperó la lectura. |
+| Último administrador | La interfaz mostró «Último admin protegido»; un SELECT confirmó que ADMIN era la única cuenta administradora activa. |
 
-Por lo tanto, este repositorio:
+**La protección del último ADMIN se verificó visualmente y por SQL, pero no se ejecutó una retirada real de esa cuenta.** La prueba de rechazo HTTP debe hacerse en una base descartable, no en el volumen habitual del equipo.
 
-- no utiliza PDO;
-- no ejecuta consultas SQL;
-- no contiene usuario ni contraseña de MariaDB;
-- no importa modelos, servicios o repositorios del backend;
-- solamente conoce las rutas, los datos y los códigos HTTP de la API.
+### Comandos de verificación de sintaxis
 
-La dirección interna de la API se obtiene mediante la variable de entorno:
-
-```text
-URL_API
-```
-
-El archivo encargado de utilizarla es:
-
-```text
-front_php/cliente_api.php
-```
-
-## Manejo de formularios
-
-Los formularios HTML reciben los valores introducidos por el usuario y los
-preparan para las solicitudes JSON al backend.
-
-En el formulario de `grupo_investigacion` se incluyen:
-
-- identificador del grupo, proporcionado al crearlo;
-- nombre y fecha de fundación;
-- URL de GrupLAC, categoría y convocatoria, cuando correspondan;
-- universidad relacionada, si existe;
-- indicador de grupo interno y ámbito.
-
-Para editar existen dos acciones:
-
-- **Guardar la ficha completa:** el frontend envía los campos editables mediante PUT.
-- **Guardar solo lo que cambié:** el frontend compara los datos y envía mediante
-  PATCH solamente los campos modificados.
-
-Las validaciones definitivas, incluidas las longitudes, las fechas y las
-relaciones entre registros, corresponden al backend.
-
-La interfaz utiliza mensajes comprensibles y evita exponer detalles internos
-del protocolo o de MariaDB al usuario.
-
-## Retiro de registros
-
-Desde el frontend se utiliza el término **retirar** y no eliminar.
-
-Al retirar un grupo, el frontend solicita a la API que ejecute DELETE. Es el
-backend quien modifica el campo `activo` para aplicar el borrado lógico.
-
-Después de retirarlo, el grupo deja de aparecer en los listados normales y no
-puede consultarse como un recurso activo.
-
-El frontend no ejecuta consultas SQL ni modifica directamente `activo`.
-
-Un identificador retirado permanece almacenado en MariaDB y no debe suponerse
-que queda disponible para volver a crear otro registro con el mismo ID.
-
-## Listas vacías
-
-Algunas entidades de V2 pueden comenzar sin registros activos.
-
-Una lista vacía no se considera un error. En el caso de grupos de investigación,
-la pantalla muestra un mensaje como:
-
-```text
-Todavía no hay grupos de investigación activos.
-```
-
-El usuario puede continuar navegando y acceder al formulario de registro.
-
-Esta situación es diferente de una falla de comunicación con la API.
-
-## API no disponible
-
-El frontend y la API son aplicaciones independientes.
-
-Si la API deja de responder, el frontend debe continuar mostrando sus páginas
-y avisar que no puede consultar o guardar los datos.
-
-En particular:
-
-- no debe intentar conectarse directamente a MariaDB;
-- no debe inventar registros para completar las tablas;
-- no debe tratar un fallo de conexión como si fuera una lista vacía;
-- debe mostrar un mensaje de error comprensible.
-
-## Archivos estáticos
-
-El frontend utiliza el servidor integrado de PHP y `index.php` como enrutador.
-
-Las peticiones de archivos físicos dentro de `publico/`, como Bootstrap y
-`css/estilos.css`, se entregan directamente mediante el servidor. Las demás
-solicitudes continúan por el sistema de rutas de la aplicación.
-
-Esto permite mantener separados los archivos visuales y las acciones de los
-formularios.
-
-## Pruebas y verificaciones
-
-Para comprobar la sintaxis de los archivos PHP, desde la raíz del repositorio
-frontend se puede ejecutar:
+Ejecutar desde la raíz del **repositorio backend**, donde está `docker-compose.yml`:
 
 ```powershell
-Get-ChildItem -Path .\front_php -Recurse -Filter *.php |
-    ForEach-Object { php -l $_.FullName }
+docker compose exec -T front-php php -l /app/index.php
+docker compose exec -T front-php php -l /app/cliente_api.php
+docker compose exec -T front-php php -l /app/vistas/compartidas/plantilla.php
+docker compose exec -T front-php php -l /app/rutas/rutas_usuario.php
+docker compose exec -T front-php php -l /app/rutas/rutas_rol_usuario.php
+docker compose exec -T front-php php -l /app/vistas/rol_usuario/gestion.php
 ```
 
-Para verificar que el CSS está disponible:
+Estos comandos **solo comprueban sintaxis**, no sustituyen las pruebas de autorización o persistencia. No se afirma haber ejecutado ya todos los comandos de la lista.
 
-```powershell
-Invoke-WebRequest -Uri "http://localhost:8110/publico/css/estilos.css" -UseBasicParsing |
-    Select-Object StatusCode
-```
+## 9. Pendientes para cerrar V3
 
-Para la primera entidad de V2 se deben comprobar, desde el navegador:
+1. Integrar el CRUD del catálogo `rol` de Miguel y alimentar dinámicamente las opciones de roles.
+2. Completar la regresión de las **16 pantallas V1/V2** para todos sus verbos y validaciones con perfiles `admin`/`consulta`.
+3. Comprobar el frontend con la **API apagada** y confirmar mensajes sin datos ficticios ni acceso directo a MariaDB.
+4. Completar pruebas de logout/cookies, CSRF manipulado, caducidad de JWT y respuesta a errores de todos los formularios.
+5. Verificar el rechazo de retiro del último ADMIN en una **base de datos descartable**; no probarlo sobre la cuenta real.
+6. Revisar con el equipo el uso de streams HTTP frente a cURL, realizar revisión cruzada y cerrar las compuertas SpecKit.
+7. Preparar los commits, Pull Requests y el tag `v3` **únicamente cuando la versión completa esté aprobada**.
 
-- el listado `/grupos-investigacion`;
-- el formulario `/grupos-investigacion/nuevo`;
-- la consulta de universidades activas;
-- la creación de un grupo con un ID no utilizado;
-- la edición completa y la edición parcial;
-- el retiro lógico;
-- la presentación de errores cuando la API no está disponible.
+El estado de los módulos desarrollados por Ángel no equivale a declarar terminada toda V3.
 
-El frontend de `grupo_investigacion` ya fue comprobado funcionalmente desde el
-navegador. Las pruebas de las nueve entidades restantes se realizarán cuando
-sus pantallas estén implementadas.
+## 10. Documentación y trabajo colaborativo
 
-## Separación entre frontend y backend
-
-Aunque ambas aplicaciones están desarrolladas en PHP, permanecen en
-repositorios independientes.
-
-El frontend no utiliza `require_once` para cargar archivos internos del
-backend. No comparte directamente modelos, controladores, servicios,
-repositorios ni conexiones a MariaDB.
+La documentación SpecKit centralizada se mantiene en el repositorio **`Proyecto_Investigacion_Backend`**, dentro de:
 
 ```text
-Frontend
-    ↓
-cliente_api.php
-    ↓ HTTP
-Backend
+docs/spec_kit/versiones/v3_seguridad/
 ```
 
-Esta separación permite modificar las capas internas del backend sin cambiar
-la interfaz, siempre que se mantengan los contratos de la API.
+Ahí se encuentran la especificación (`2_spec.md`), el plan (`3_plan.md`), los contratos (`6_contracts.md`), el quickstart (`7_quickstart.md`), las tareas (`8_tasks.md`), el checklist (`9_checklist.md`) y el registro de pruebas del frontend (`REGISTRO_FASE6_FRONTEND.md`). **No se duplican documentos SpecKit en este repositorio frontend.**
 
-## Alcance de la v2
+### Rama de trabajo
 
-La v2 tiene como objetivo ofrecer interfaces CRUD para las **16 entidades del
-módulo de Investigación**: las seis conservadas de V1 y las diez relacionadas
-que se incorporan progresivamente.
+El desarrollo de Ángel en este repositorio se realiza en:
 
-En el estado actual del proyecto hay siete interfaces disponibles: las seis de
-V1 y `grupo_investigacion` de V2.
+```text
+feature/angel-frontend-v3
+```
 
-El desarrollo de autenticación, usuarios, roles, JWT, dashboard y despliegue
-corresponde a versiones posteriores, según la planificación del proyecto.
-
-La documentación técnica de las relaciones, los contratos y las tareas se
-mantiene en `docs/spec_kit/` dentro del repositorio backend.
+La rama complementaria del backend es `feature/angel-investigacion-v3`. Los commits y PR se preparan **por repositorio**; el integrador revisa antes de llevar cambios a `main`. Mantener separados frontend, backend y sus responsabilidades facilita las pruebas y la sustentación del proyecto.

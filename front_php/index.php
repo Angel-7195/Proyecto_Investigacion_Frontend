@@ -294,6 +294,16 @@ require __DIR__ . '/rutas/rutas_ods_linea.php';
 require __DIR__ . '/rutas/rutas_aa_linea.php';
 require __DIR__ . '/rutas/rutas_grupo_linea.php';
 require __DIR__ . '/rutas/rutas_semillero_linea.php';
+// ----------------------------------------------------------------------
+// ADMINISTRACIÓN DE USUARIOS — V3
+// ----------------------------------------------------------------------
+
+require __DIR__ . '/rutas/rutas_usuario.php';
+
+// ----------------------------------------------------------------------
+// ASIGNACIONES DE ROLES A USUARIOS — V3
+// ----------------------------------------------------------------------
+require __DIR__ . '/rutas/rutas_rol_usuario.php';
 
 // ----------------------------------------------------------------------
 // RUTA NO ENCONTRADA

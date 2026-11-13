@@ -602,3 +602,83 @@ function retirarAsociacionSemilleroLinea(int $semilleroId, int $lineaId): array
 {
     return adaptarRespuestaApi(llamarApi('DELETE', 'semillero_linea', [(string) $semilleroId, (string) $lineaId]));
 }
+
+// ----------------------------------------------------------------------
+// USUARIOS — V3 (SOLO ADMIN)
+// ----------------------------------------------------------------------
+
+function listarUsuarios(): array
+{
+    return adaptarRespuestaApi(
+        llamarApi('GET', 'usuario')
+    );
+}
+
+function crearUsuario(array $datos): array
+{
+    return adaptarRespuestaApi(
+        llamarApi('POST', 'usuario', '', $datos)
+    );
+}
+
+// ----------------------------------------------------------------------
+// USUARIOS — V3
+// ----------------------------------------------------------------------
+
+// Consultar un usuario por su ID.
+function obtenerUsuario(int $id): array
+{
+    return adaptarRespuestaApi(
+        llamarApi('GET', 'usuario', (string) $id)
+    );
+}
+
+// Actualizar todos los datos del perfil de un usuario.
+function reemplazarUsuario(int $id, array $datos): array
+{
+    return adaptarRespuestaApi(
+        llamarApi('PUT', 'usuario', (string) $id, $datos)
+    );
+}
+
+// Actualizar únicamente los campos modificados del usuario.
+function actualizarUsuarioParcial(int $id, array $datos): array
+{
+    return adaptarRespuestaApi(
+        llamarApi('PATCH', 'usuario', (string) $id, $datos)
+    );
+}
+
+// ----------------------------------------------------------------------
+// ASIGNACIONES ROL_USUARIO — V3 (SOLO ADMIN)
+// ----------------------------------------------------------------------
+
+function listarRolesUsuario(): array
+{
+    return adaptarRespuestaApi(llamarApi('GET', 'rol_usuario'));
+}
+
+function obtenerRolUsuario(int $usuarioId, int $rolId): array
+{
+    // Es una clave compuesta: pasar los segmentos como array evita codificar la barra.
+    return adaptarRespuestaApi(
+        llamarApi('GET', 'rol_usuario', [(string) $usuarioId, (string) $rolId])
+    );
+}
+
+function asignarRolUsuario(int $usuarioId, int $rolId): array
+{
+    return adaptarRespuestaApi(
+        llamarApi('POST', 'rol_usuario', '', [
+            'usuario_id' => $usuarioId,
+            'rol_id' => $rolId,
+        ])
+    );
+}
+
+function retirarRolUsuario(int $usuarioId, int $rolId): array
+{
+    return adaptarRespuestaApi(
+        llamarApi('DELETE', 'rol_usuario', [(string) $usuarioId, (string) $rolId])
+    );
+}
