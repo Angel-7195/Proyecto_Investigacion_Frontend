@@ -4,12 +4,25 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../compartidas/plantilla.php';
 
-/** Muestra el formulario; la contraseña nunca se vuelve a escribir en HTML. */
+/** Muestra el formulario; nunca vuelve a mostrar la contraseña introducida por el visitante. */
 function mostrarLogin(string $error = ''): void
 {
     $_SESSION['csrf_login'] ??= bin2hex(random_bytes(32));
     $csrf = htmlspecialchars((string) $_SESSION['csrf_login'], ENT_QUOTES, 'UTF-8');
     $errorSeguro = htmlspecialchars($error, ENT_QUOTES, 'UTF-8');
+
+    // Las credenciales de demostración solo se muestran si se habilitan
+    // expresamente en el entorno del frontend. No son datos del JWT ni de la API.
+    $modoDemo = getenv('LOGIN_DEMO_ENABLED') === '1';
+    $usuarioDemo = trim((string) getenv('LOGIN_DEMO_ADMIN_USERNAME'));
+    $claveDemo = getenv('LOGIN_DEMO_ADMIN_PASSWORD');
+    $mostrarDemo = $modoDemo && $usuarioDemo !== ''
+        && is_string($claveDemo) && $claveDemo !== '';
+
+    if ($mostrarDemo) {
+        $usuarioDemoSeguro = htmlspecialchars($usuarioDemo, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $claveDemoSeguro = htmlspecialchars($claveDemo, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    }
 
     ob_start();
     ?>
@@ -38,6 +51,24 @@ function mostrarLogin(string $error = ''): void
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Ingresar</button>
                     </form>
+
+                    <?php if ($mostrarDemo): ?>
+                        <aside class="alert alert-info mt-4 mb-0" aria-label="Credenciales de demostración">
+                            <h2 class="h6 alert-heading mb-2">Acceso de demostración</h2>
+                            <p class="small mb-2">
+                                Cuenta de prueba para la evaluación académica.
+                                Utilízala únicamente en un entorno con datos ficticios.
+                            </p>
+                            <dl class="row small mb-0">
+                                <dt class="col-5">Rol</dt>
+                                <dd class="col-7">Administrador</dd>
+                                <dt class="col-5">Usuario</dt>
+                                <dd class="col-7"><code><?= $usuarioDemoSeguro ?></code></dd>
+                                <dt class="col-5">Contraseña</dt>
+                                <dd class="col-7"><code><?= $claveDemoSeguro ?></code></dd>
+                            </dl>
+                        </aside>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
