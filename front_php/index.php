@@ -304,6 +304,7 @@ require __DIR__ . '/rutas/rutas_usuario.php';
 // ASIGNACIONES DE ROLES A USUARIOS — V3
 // ----------------------------------------------------------------------
 require __DIR__ . '/rutas/rutas_rol_usuario.php';
+require __DIR__ . '/rutas/rutas_rol.php';
 
 // ----------------------------------------------------------------------
 // RUTA NO ENCONTRADA

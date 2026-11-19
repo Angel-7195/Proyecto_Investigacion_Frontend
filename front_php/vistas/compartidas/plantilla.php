@@ -78,6 +78,7 @@ function renderizarPlantilla(string $titulo, string $contenido): void
 
                             <?php if ($esAdmin): ?>
                                 <a class="nav-link" href="/usuarios">Usuarios</a>
+                                <a class="nav-link" href="/roles">Roles</a>
                                 <a class="nav-link" href="/roles-usuarios">Roles por usuario</a>
                                 <span class="navbar-text text-white ms-lg-3 small">Administrador</span>
                             <?php elseif ($esConsulta): ?>
