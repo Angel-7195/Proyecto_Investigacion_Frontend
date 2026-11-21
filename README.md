@@ -4,6 +4,8 @@
 roles (en desarrollo)**
 
 - Pagina Desplegada con AlwaysData: https://proyectoinvestigacion.alwaysdata.net/
+- Usuario: ADMIN
+- Contraseña: administrator123
 
 ## Repositorios:
 
